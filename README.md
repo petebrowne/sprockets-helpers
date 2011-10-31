@@ -87,7 +87,7 @@ The helpers can also be used in the app itself. You just include the `Sprockets:
 
 Now the following index file:
 
-``` html
+``` erb
 <!doctype html>
 <html lang="en">
   <head>
@@ -127,7 +127,7 @@ If the source is not an asset in the Sprockets environment, Sprockets::Helpers w
 
 Given an image, `public/images/logo.jpg`:
 
-``` html
+``` erb
 <img src="<%= image_path "logo.jpg" %>">
 ```
 
