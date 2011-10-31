@@ -67,10 +67,10 @@ end
 Usage in Assets
 ---------------
 
-Simply requiring "sprockets-helpers" will add the asset path helpers to the Sprocket context, making them available within any asset. For example, a file `assets/javascripts/paths.js.erb`:
+Simply requiring sprockets-helpers will add the asset path helpers to the Sprocket context, making them available within any asset. For example, a file `assets/javascripts/paths.js.erb`:
 
 ``` erb
-var Paths = { railsImage: "<%= image_path "rails.png %>" %>};
+var Paths = { railsImage: "<%= image_path "rails.png %>" };
 ```
 
 Would be transformed into:
@@ -87,7 +87,7 @@ The helpers can also be used in the app itself. You just include the `Sprockets:
 
 Now the following index file:
 
-``` erb
+``` html
 <!doctype html>
 <html lang="en">
   <head>
@@ -127,7 +127,7 @@ If the source is not an asset in the Sprockets environment, Sprockets::Helpers w
 
 Given an image, `public/images/logo.jpg`:
 
-``` erb
+``` html
 <img src="<%= image_path "logo.jpg" %>">
 ```
 
