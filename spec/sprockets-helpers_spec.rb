@@ -87,4 +87,36 @@ describe Sprockets::Helpers do
       end
     end
   end
+  
+  describe "#javascript_path" do
+    context "with regular files" do
+      it "appends the js extension" do
+        context.javascript_path("/path/to/file").should == "/path/to/file.js"
+      end
+      
+      it "prepends the javascripts dir" do
+        context.javascript_path("main").should == "/javascripts/main.js"
+      end
+    end
+  end
+  
+  describe "#stylesheet_path" do
+    context "with regular files" do
+      it "appends the css extension" do
+        context.stylesheet_path("/path/to/file").should == "/path/to/file.css"
+      end
+      
+      it "prepends the stylesheets dir" do
+        context.stylesheet_path("main").should == "/stylesheets/main.css"
+      end
+    end
+  end
+  
+  describe "#image_path" do
+    context "with regular files" do
+      it "prepends the images dir" do
+        context.image_path("logo.jpg").should == "/images/logo.jpg"
+      end
+    end
+  end
 end

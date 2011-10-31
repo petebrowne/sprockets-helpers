@@ -47,6 +47,21 @@ module Sprockets
       # Use FilePath for normal files on the file system
       FilePath.new(source, options).to_s
     end
+    
+    #
+    def javascript_path(source, options = {})
+      asset_path source, { :dir => "javascripts", :ext => "js" }.merge(options)
+    end
+    
+    #
+    def stylesheet_path(source, options = {})
+      asset_path source, { :dir => "stylesheets", :ext => "css" }.merge(options)
+    end
+    
+    #
+    def image_path(source, options = {})
+      asset_path source, { :dir => "images" }.merge(options)
+    end
   end
   
   class Context
