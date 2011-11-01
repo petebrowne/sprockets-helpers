@@ -84,6 +84,7 @@ module Sprockets
       # Use FilePath for normal files on the file system
       FilePath.new(source, options).to_s
     end
+    alias_method :path_to_asset, :asset_path
     
     # Computes the path to a javascript asset either in the Sprockets
     # environment or the public directory. If the +source+ filename has no extension,
@@ -108,6 +109,7 @@ module Sprockets
     def javascript_path(source, options = {})
       asset_path source, { :dir => "javascripts", :ext => "js" }.merge(options)
     end
+    alias_method :path_to_javascript, :javascript_path
     
     # Computes the path to a stylesheet asset either in the Sprockets
     # environment or the public directory. If the +source+ filename has no extension,
@@ -132,6 +134,7 @@ module Sprockets
     def stylesheet_path(source, options = {})
       asset_path source, { :dir => "stylesheets", :ext => "css" }.merge(options)
     end
+    alias_method :path_to_stylesheet, :stylesheet_path
     
     # Computes the path to an image asset either in the Sprockets environment
     # or the public directory. External URIs are untouched.
@@ -155,6 +158,7 @@ module Sprockets
     def image_path(source, options = {})
       asset_path source, { :dir => "images" }.merge(options)
     end
+    alias_method :path_to_image, :image_path
     
     protected
     

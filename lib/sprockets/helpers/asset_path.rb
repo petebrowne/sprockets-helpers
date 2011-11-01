@@ -19,7 +19,7 @@ module Sprockets
       # Prepends the base path if the path is not
       # already an absolute path.
       def rewrite_base_path(path) # :nodoc:
-        File.join @options[:prefix], path
+        File.join @options[:prefix].to_s, path
       end
       
       # Rewrite the query string to inlcude body flag if necessary.
