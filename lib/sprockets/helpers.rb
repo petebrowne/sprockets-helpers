@@ -13,6 +13,10 @@ module Sprockets
       # When true, the asset paths will return digest paths.
       attr_accessor :digest
       
+      # Set the Sprockets environment to search for assets.
+      # This defaults to the context's #environment method.
+      attr_accessor :environment
+      
       # The base URL the Sprocket environment is mapped to.
       # This defaults to "/assets".
       def prefix
@@ -38,7 +42,6 @@ module Sprockets
     # * <tt>:dir</tt> - The directory to prepend if the file is in the public directory.
     # * <tt>:digest</tt> - Wether or not use the digest paths for assets. Set Sprockets::Helpers.digest for global configuration.
     # * <tt>:prefix</tt> - Use a custom prefix for the Sprockets environment. Set Sprockets::Helpers.prefix for global configuration.
-    #
     #
     # ==== Examples
     #
@@ -68,8 +71,8 @@ module Sprockets
         
       # If the source points to an asset in the Sprockets
       # environment use AssetPath to generate the full path.
-      environment.resolve(source) do |path|
-        return AssetPath.new(environment.find_asset(path), options).to_s
+      assets_environment.resolve(source) do |path|
+        return AssetPath.new(assets_environment[path], options).to_s
       end
       
       # Use FilePath for normal files on the file system
@@ -145,6 +148,16 @@ module Sprockets
     #
     def image_path(source, options = {})
       asset_path source, { :dir => "images" }.merge(options)
+    end
+    
+    protected
+    
+    # Returns the Sprockets environment #asset_path uses to search for
+    # assets. This can be overridden for more control, if necessary.
+    # Defaults to Sprockets::Helpers.environment or the envrionment
+    # returned by #environment.
+    def assets_environment
+      Helpers.environment || environment
     end
   end
   

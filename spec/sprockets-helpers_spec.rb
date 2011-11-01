@@ -85,6 +85,18 @@ describe Sprockets::Helpers do
           context.asset_path("main", :ext => "js", :body => true).should == "/assets/main.js?body=1"
         end
       end
+      
+      it "uses a custom assets environment" do
+        within_construct do |c|
+          c.file "themes/main.css"
+          
+          custom_env = Sprockets::Environment.new
+          custom_env.append_path "themes"
+          Sprockets::Helpers.environment = custom_env
+          context.asset_path("main.css").should == "/assets/main.css"
+          Sprockets::Helpers.environment = nil
+        end
+      end
     end
   end
   
