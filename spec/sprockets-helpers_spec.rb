@@ -1,6 +1,76 @@
 require "spec_helper"
 
 describe Sprockets::Helpers do
+  describe ".configure" do
+    it "sets global configuration" do
+      within_construct do |c|
+        c.file "assets/main.css"
+        
+        context.asset_path("main.css").should == "/assets/main.css"
+        Sprockets::Helpers.configure do |config|
+          config.digest = true
+          config.prefix = "/themes"
+        end
+        context.asset_path("main.css").should =~ %r(/themes/main-[0-9a-f]+.css)
+        Sprockets::Helpers.digest = nil
+        Sprockets::Helpers.prefix = nil
+      end
+    end
+  end
+  
+  describe ".digest" do
+    it "globally configures digest paths" do
+      within_construct do |c|
+        c.file "assets/main.js"
+        
+        context.asset_path("main", :ext => "js").should == "/assets/main.js"
+        Sprockets::Helpers.digest = true
+        context.asset_path("main", :ext => "js").should =~ %r(/assets/main-[0-9a-f]+.js)
+        Sprockets::Helpers.digest = nil
+      end
+    end
+  end
+  
+  describe ".environment" do
+    it "sets a custom assets environment" do
+      within_construct do |c|
+        c.file "themes/main.css"
+        
+        custom_env = Sprockets::Environment.new
+        custom_env.append_path "themes"
+        Sprockets::Helpers.environment = custom_env
+        context.asset_path("main.css").should == "/assets/main.css"
+        Sprockets::Helpers.environment = nil
+      end
+    end
+  end
+  
+  describe ".prefix" do
+    it "sets a custom assets prefix" do
+      within_construct do |c|
+        c.file "assets/logo.jpg"
+        
+        context.asset_path("logo.jpg").should == "/assets/logo.jpg"
+        Sprockets::Helpers.prefix = "/images"
+        context.asset_path("logo.jpg").should == "/images/logo.jpg"
+        Sprockets::Helpers.prefix = nil
+      end
+    end
+  end
+  
+  describe ".public_path" do
+    it "sets a custom location for the public path" do
+      within_construct do |c|
+        c.file "output/main.js"
+        
+        context.asset_path("main.js").should == "/main.js"
+        Sprockets::Helpers.public_path = "./output"
+        context.asset_path("main.js").should =~ %r(/main.js\?\d+)
+        Sprockets::Helpers.public_path = nil
+      end
+    end
+  end
+  
   describe "#asset_path" do
     context "with URIs" do
       it "returns URIs untouched" do
@@ -32,8 +102,8 @@ describe Sprockets::Helpers do
       
       it "appends a timestamp if the file exists in the output path" do
         within_construct do |c|
-          file1 = c.file "public/main.js"
-          file2 = c.file "public/favicon.ico"
+          c.file "public/main.js"
+          c.file "public/favicon.ico"
           
           context.asset_path("main", :ext => "js").should =~ %r(/main.js\?\d+)
           context.asset_path("/favicon.ico").should =~ %r(/favicon.ico\?\d+)
@@ -60,9 +130,6 @@ describe Sprockets::Helpers do
           
           context.asset_path("logo.jpg").should == "/assets/logo.jpg"
           context.asset_path("logo.jpg", :prefix => "/images").should == "/images/logo.jpg"
-          Sprockets::Helpers.prefix = "/images"
-          context.asset_path("logo.jpg").should == "/images/logo.jpg"
-          Sprockets::Helpers.prefix = "/assets"
         end
       end
       
@@ -72,9 +139,6 @@ describe Sprockets::Helpers do
           
           context.asset_path("main", :ext => "js").should == "/assets/main.js"
           context.asset_path("main", :ext => "js", :digest => true).should =~ %r(/assets/main-[0-9a-f]+.js)
-          Sprockets::Helpers.digest = true
-          context.asset_path("main", :ext => "js").should =~ %r(/assets/main-[0-9a-f]+.js)
-          Sprockets::Helpers.digest = false
         end
       end
       
@@ -83,18 +147,6 @@ describe Sprockets::Helpers do
           c.file "assets/main.js"
           
           context.asset_path("main", :ext => "js", :body => true).should == "/assets/main.js?body=1"
-        end
-      end
-      
-      it "uses a custom assets environment" do
-        within_construct do |c|
-          c.file "themes/main.css"
-          
-          custom_env = Sprockets::Environment.new
-          custom_env.append_path "themes"
-          Sprockets::Helpers.environment = custom_env
-          context.asset_path("main.css").should == "/assets/main.css"
-          Sprockets::Helpers.environment = nil
         end
       end
     end

@@ -43,18 +43,22 @@ class App < Sinatra::Base
     sprockets.append_path File.join(root, "assets", "images")
     
     # Configure Sprockets::Helpers (if necessary)
-    Sprockets::Helpers.prefix      = assets_prefix
-    Sprockets::Helpers.digest      = digest_assets
-    Sprockets::Helpers.public_path = public_folder
+    Sprockets::Helpers.configure do |config|
+      config.environment = sprockets
+      config.prefix      = assets_prefix
+      config.digest      = digest_assets
+      config.public_path = public_folder
+    end
   end
   
   helpers do
     include Sprockets::Helpers
     
-    # required for Sprockets::Helpers to work!
-    def environment
-      settings.sprockets
-    end
+    # Alternative method for telling Sprockets::Helpers which
+    # Sprockets environment to use.
+    # def assets_environment
+    #   settings.sprockets
+    # end
   end
   
   get "/" do
@@ -83,7 +87,7 @@ var Paths = { railsImage: "/assets/rails.png" };
 Usage in the App
 ----------------
 
-The helpers can also be used in the app itself. You just include the `Sprockets::Helpers` module and add an `#environment` method which returns a reference to the Sprockets environment (see the Sinatra app setup above).
+The helpers can also be used in the app itself. You just include the `Sprockets::Helpers` module and set Sprockets::Helpers.environment to the Sprockets environment to search for the assets. Alternatively you can define an #assets_environment method in the context of #asset_path, which returns a reference to the Sprockets environment (see above).
 
 Now the following index file:
 

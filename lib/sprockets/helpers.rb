@@ -31,6 +31,11 @@ module Sprockets
         @public_path ||= "./public"
       end
       attr_writer :public_path
+      
+      # Convience method for configuring Sprockets::Helpers.
+      def configure
+        yield self
+      end
     end
     
     # Returns the path to an asset either in the Sprockets environment
@@ -42,6 +47,7 @@ module Sprockets
     # * <tt>:dir</tt> - The directory to prepend if the file is in the public directory.
     # * <tt>:digest</tt> - Wether or not use the digest paths for assets. Set Sprockets::Helpers.digest for global configuration.
     # * <tt>:prefix</tt> - Use a custom prefix for the Sprockets environment. Set Sprockets::Helpers.prefix for global configuration.
+    # * <tt>:body</tt> - Adds a ?body=1 flag that tells Sprockets to return only the body of the asset.
     #
     # ==== Examples
     #
