@@ -24,7 +24,7 @@ $ gem install sprockets-helpers
 Setup
 -----
 
-Let's build a simple Sinatra app using Sprockets and Sprockets::Helpers (See [sinatra-asset-pipeline](https://github.com/stevehodgkiss/sinatra-asset-pipeline) for complete setup):
+Let's build a simple Sinatra app using Sprockets and Sprockets::Helpers (See my fork of [sinatra-asset-pipeline](https://github.com/petebrowne/sinatra-asset-pipeline) for complete setup):
 
 ``` ruby
 require "sinatra/base"
