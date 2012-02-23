@@ -46,14 +46,28 @@ describe Sprockets::Helpers do
   end
   
   describe ".prefix" do
-    it "sets a custom assets prefix" do
-      within_construct do |c|
-        c.file "assets/logo.jpg"
-        
-        context.asset_path("logo.jpg").should == "/assets/logo.jpg"
-        Sprockets::Helpers.prefix = "/images"
-        context.asset_path("logo.jpg").should == "/images/logo.jpg"
-        Sprockets::Helpers.prefix = nil
+    context "that is a string" do
+      it "sets a custom assets prefix" do
+        within_construct do |c|
+          c.file "assets/logo.jpg"
+
+          context.asset_path("logo.jpg").should == "/assets/logo.jpg"
+          Sprockets::Helpers.prefix = "/images"
+          context.asset_path("logo.jpg").should == "/images/logo.jpg"
+          Sprockets::Helpers.prefix = nil
+        end
+      end
+    end
+
+    context "that is a proc" do
+      it "sets a custom assets prefix" do
+        within_construct do |c|
+          c.file "assets/logo.jpg"
+
+          Sprockets::Helpers.prefix = Proc.new { |source| "http://example.com/#{File.basename(source, '.jpg')}" }
+          context.asset_path("logo.jpg").should == "http://example.com/logo/logo.jpg"
+          Sprockets::Helpers.prefix = nil
+        end
       end
     end
   end
