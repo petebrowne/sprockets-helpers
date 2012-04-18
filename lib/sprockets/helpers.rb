@@ -3,8 +3,9 @@ require "sprockets"
 
 module Sprockets
   module Helpers
-    autoload :AssetPath, "sprockets/helpers/asset_path"
-    autoload :FilePath,  "sprockets/helpers/file_path"
+    autoload :AssetPath,    "sprockets/helpers/asset_path"
+    autoload :FilePath,     "sprockets/helpers/file_path"
+    autoload :ManifestPath, "sprockets/helpers/manifest_path"
     
     # Pattern for checking if a given path is an external URI.
     URI_MATCH = %r(^[-a-z]+://|^cid:|^//)
@@ -16,7 +17,10 @@ module Sprockets
       # Set the Sprockets environment to search for assets.
       # This defaults to the context's #environment method.
       attr_accessor :environment
-      
+
+      # The manifest file used for lookup
+      attr_accessor :manifest
+
       # The base URL the Sprocket environment is mapped to.
       # This defaults to "/assets".
       def prefix
@@ -75,6 +79,11 @@ module Sprockets
         source << ".#{options[:ext]}"
       end
         
+      # If a manifest is present, try to grab the path from the manifest first
+      if Helpers.manifest && Helpers.manifest.assets[source]
+        return ManifestPath.new(Helpers.manifest.assets[source], options).to_s
+      end
+
       # If the source points to an asset in the Sprockets
       # environment use AssetPath to generate the full path.
       assets_environment.resolve(source) do |path|
