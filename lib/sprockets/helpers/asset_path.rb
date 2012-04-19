@@ -16,8 +16,7 @@ module Sprockets
       
       protected
       
-      # Prepends the base path if the path is not
-      # already an absolute path.
+      # Prepends the assets prefix
       def rewrite_base_path(path) # :nodoc:
         prefix = if options[:prefix].respond_to? :call
           options[:prefix].call path
