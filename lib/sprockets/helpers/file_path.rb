@@ -35,7 +35,7 @@ module Sprockets
       # already an absolute path.
       def rewrite_base_path(path) # :nodoc:
         if path !~ %r(^/)
-          File.join("/", dir, path)
+          File.join('/', dir, path)
         else
           path
         end

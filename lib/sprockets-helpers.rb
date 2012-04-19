@@ -1,1 +1,1 @@
-require "sprockets/helpers"
+require 'sprockets/helpers'
