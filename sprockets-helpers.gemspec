@@ -7,9 +7,9 @@ Gem::Specification.new do |s|
   s.version     = Sprockets::Helpers::VERSION
   s.authors     = ['Pete Browne']
   s.email       = ['me@petebrowne.com']
-  s.homepage    = 'https://github.com/petebrowne/sprockets-sass'
-  s.summary     = 'Asset path helpers for Sprockets 2.0 applications'
-  s.description = 'Asset path helpers for Sprockets 2.0 applications'
+  s.homepage    = 'https://github.com/petebrowne/sprockets-helpers'
+  s.summary     = 'Asset path helpers for Sprockets 2.x applications'
+  s.description = 'Asset path helpers for Sprockets 2.x applications'
 
   s.rubyforge_project = 'sprockets-helpers'
 
