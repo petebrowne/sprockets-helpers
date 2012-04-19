@@ -84,7 +84,31 @@ describe Sprockets::Helpers do
       end
     end
   end
-  
+
+  describe "manifest" do
+    it "reads path from a manifest file" do
+      within_construct do |c|
+        c.file "assets/application.js"
+
+        dir = File.join(Dir::tmpdir, 'sprockets/manifest')
+        
+        manifest = Sprockets::Manifest.new(env, File.join(dir, 'manifest.json'))
+        manifest.compile 'application.js'
+
+        Sprockets::Helpers.configure do |config|
+          config.digest = true
+          config.prefix = "/assets"
+          config.manifest = Sprockets::Manifest.new(env, File.join(dir, 'manifest.json'))
+        end
+
+        context.asset_path("application.js").should =~ %r(/assets/application-[0-9a-f]+.js)        
+
+        Sprockets::Helpers.digest = nil
+        Sprockets::Helpers.prefix = nil
+      end
+    end
+  end
+
   describe "#asset_path" do
     context "with URIs" do
       it "returns URIs untouched" do
