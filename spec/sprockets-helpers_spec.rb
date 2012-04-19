@@ -85,30 +85,6 @@ describe Sprockets::Helpers do
     end
   end
 
-  describe 'manifest' do
-    it 'reads path from a manifest file' do
-      within_construct do |c|
-        c.file 'assets/application.js'
-
-        dir = File.join(Dir::tmpdir, 'sprockets/manifest')
-        
-        manifest = Sprockets::Manifest.new(env, File.join(dir, 'manifest.json'))
-        manifest.compile 'application.js'
-
-        Sprockets::Helpers.configure do |config|
-          config.digest = true
-          config.prefix = '/assets'
-          config.manifest = Sprockets::Manifest.new(env, File.join(dir, 'manifest.json'))
-        end
-
-        context.asset_path('application.js').should =~ %r(/assets/application-[0-9a-f]+.js)        
-
-        Sprockets::Helpers.digest = nil
-        Sprockets::Helpers.prefix = nil
-      end
-    end
-  end
-
   describe '#asset_path' do
     context 'with URIs' do
       it 'returns URIs untouched' do
@@ -185,6 +161,32 @@ describe Sprockets::Helpers do
           c.file 'assets/main.js'
           
           context.asset_path('main', :ext => 'js', :body => true).should == '/assets/main.js?body=1'
+        end
+      end
+    end
+    
+    if defined?(::Sprockets::Manifest)
+      context 'with a manifest' do
+        it 'reads path from a manifest file' do
+          within_construct do |c|
+            asset_file    = c.file 'assets/application.js'
+            manifest_file = c.join 'manifest.json'
+        
+            manifest = Sprockets::Manifest.new(env, manifest_file)
+            manifest.compile 'application.js'
+
+            Sprockets::Helpers.configure do |config|
+              config.digest   = true
+              config.prefix   = '/assets'
+              config.manifest = Sprockets::Manifest.new(env, manifest_file)
+            end
+              
+            asset_file.delete
+            context.asset_path('application.js').should =~ %r(/assets/application-[0-9a-f]+.js)        
+
+            Sprockets::Helpers.digest = nil
+            Sprockets::Helpers.prefix = nil
+          end
         end
       end
     end
