@@ -101,6 +101,7 @@ describe Sprockets::Helpers do
       it 'returns absolute paths' do
         context.asset_path('/path/to/file.js').should == '/path/to/file.js'
         context.asset_path('/path/to/file.jpg').should == '/path/to/file.jpg'
+        context.asset_path('/path/to/file.eot?#iefix').should == '/path/to/file.eot?#iefix'
       end
       
       it 'appends the extension for javascripts and stylesheets' do
@@ -150,9 +151,11 @@ describe Sprockets::Helpers do
       it 'uses the digest path if configured' do
         within_construct do |c|
           c.file 'assets/main.js'
+          c.file 'assets/main.eot'
           
           context.asset_path('main', :ext => 'js').should == '/assets/main.js'
           context.asset_path('main', :ext => 'js', :digest => true).should =~ %r(/assets/main-[0-9a-f]+.js)
+          context.asset_path('main.eot?#iefix', :digest => true).should =~ %r(/assets/main-[0-9a-f]+.eot\?#iefix)
         end
       end
       
