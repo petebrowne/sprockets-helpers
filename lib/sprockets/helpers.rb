@@ -74,7 +74,7 @@ module Sprockets
     # 
     def asset_path(source, options = {})
       return source if source =~ URI_MATCH
-
+      
       # Extract the path, so we can add any query string items back on.
       uri = URI.parse(source)
       source = uri.path
@@ -84,23 +84,12 @@ module Sprockets
         source << ".#{options[:ext]}"
       end
       
-      # If a manifest is present, try to grab the path from the manifest first
-      if Helpers.manifest && Helpers.manifest.assets[source]
-        source = ManifestPath.new(Helpers.manifest.assets[source], options).to_s
-      end
+      source = materialize_path(source, options)
       
-      # If the source points to an asset in the Sprockets
-      # environment use AssetPath to generate the full path.
-      assets_environment.resolve(source) do |path|
-        source = AssetPath.new(assets_environment[path], options).to_s
-      end
-      
-      # Use FilePath for normal files on the file system
-      source = FilePath.new(source, options).to_s
-
       # Return the reconstructed URI
-      uri.path = source
-      uri.to_s
+      source << "?#{uri.query}" if uri.query
+      source << "##{uri.fragment}" if uri.fragment
+      source
     end
     alias_method :path_to_asset, :asset_path
     
@@ -186,6 +175,22 @@ module Sprockets
     # returned by #environment.
     def assets_environment
       Helpers.environment || environment
+    end
+    
+    def materialize_path(source, options = {})
+      # If a manifest is present, try to grab the path from the manifest first
+      if Helpers.manifest && Helpers.manifest.assets[source]
+        return ManifestPath.new(Helpers.manifest.assets[source], options).to_s
+      end
+      
+      # If the source points to an asset in the Sprockets
+      # environment use AssetPath to generate the full path.
+      assets_environment.resolve(source) do |path|
+        return AssetPath.new(assets_environment[path], options).to_s
+      end
+      
+      # Use FilePath for normal files on the file system
+      FilePath.new(source, options).to_s
     end
   end
   
