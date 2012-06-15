@@ -1,5 +1,6 @@
 require 'sprockets/helpers/version'
 require 'sprockets'
+require 'uri'
 
 module Sprockets
   module Helpers
@@ -73,25 +74,32 @@ module Sprockets
     # 
     def asset_path(source, options = {})
       return source if source =~ URI_MATCH
+
+      # Extract the path, so we can add any query string items back on.
+      uri = URI.parse(source)
+      source = uri.path
       
       # Append extension if necessary
       if options[:ext] && File.extname(source).empty?
         source << ".#{options[:ext]}"
       end
-        
+      
       # If a manifest is present, try to grab the path from the manifest first
       if Helpers.manifest && Helpers.manifest.assets[source]
-        return ManifestPath.new(Helpers.manifest.assets[source], options).to_s
+        uri.path = ManifestPath.new(Helpers.manifest.assets[source], options).to_s
       end
-
+      
       # If the source points to an asset in the Sprockets
       # environment use AssetPath to generate the full path.
       assets_environment.resolve(source) do |path|
-        return AssetPath.new(assets_environment[path], options).to_s
+        uri.path = AssetPath.new(assets_environment[path], options).to_s
       end
       
       # Use FilePath for normal files on the file system
-      FilePath.new(source, options).to_s
+      uri.path = FilePath.new(source, options).to_s
+
+      # Return the reconstructed URI
+      uri.to_s
     end
     alias_method :path_to_asset, :asset_path
     
