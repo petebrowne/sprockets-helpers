@@ -86,19 +86,20 @@ module Sprockets
       
       # If a manifest is present, try to grab the path from the manifest first
       if Helpers.manifest && Helpers.manifest.assets[source]
-        uri.path = ManifestPath.new(Helpers.manifest.assets[source], options).to_s
+        source = ManifestPath.new(Helpers.manifest.assets[source], options).to_s
       end
       
       # If the source points to an asset in the Sprockets
       # environment use AssetPath to generate the full path.
       assets_environment.resolve(source) do |path|
-        uri.path = AssetPath.new(assets_environment[path], options).to_s
+        source = AssetPath.new(assets_environment[path], options).to_s
       end
       
       # Use FilePath for normal files on the file system
-      uri.path = FilePath.new(source, options).to_s
+      source = FilePath.new(source, options).to_s
 
       # Return the reconstructed URI
+      uri.path = source
       uri.to_s
     end
     alias_method :path_to_asset, :asset_path
