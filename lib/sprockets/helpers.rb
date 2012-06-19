@@ -8,9 +8,6 @@ module Sprockets
     autoload :FilePath,     'sprockets/helpers/file_path'
     autoload :ManifestPath, 'sprockets/helpers/manifest_path'
     
-    # Pattern for checking if a given path is an external URI.
-    URI_MATCH = %r(^[-a-z]+://|^cid:|^//)
-    
     class << self
       # When true, the asset paths will return digest paths.
       attr_accessor :digest
@@ -73,23 +70,29 @@ module Sprockets
     #   asset_path 'http://www.example.com/js/xmlhr.js'   # => 'http://www.example.com/js/xmlhr.js'
     # 
     def asset_path(source, options = {})
-      return source if source =~ URI_MATCH
-      
-      # Extract the path, so we can add any query string items back on.
       uri = URI.parse(source)
-      source = uri.path
+      
+      # Return fast if the URI is absolute
+      return source if uri.absolute?
       
       # Append extension if necessary
-      if options[:ext] && File.extname(source).empty?
-        source << ".#{options[:ext]}"
+      if options[:ext] && File.extname(uri.path).empty?
+        uri.path << ".#{options[:ext]}"
       end
       
-      source = materialize_path(source, options)
+      # If a manifest is present, try to grab the path from the manifest first
+      if Helpers.manifest && Helpers.manifest.assets[uri.path]
+        return ManifestPath.new(uri, Helpers.manifest.assets[uri.path], options).to_s
+      end
       
-      # Return the reconstructed URI
-      source << "?#{uri.query}" if uri.query
-      source << "##{uri.fragment}" if uri.fragment
-      source
+      # If the source points to an asset in the Sprockets
+      # environment use AssetPath to generate the full path.
+      assets_environment.resolve(uri.path) do |path|
+        return AssetPath.new(uri, assets_environment[path], options).to_s
+      end
+      
+      # Use FilePath for normal files on the file system
+      FilePath.new(uri, options).to_s
     end
     alias_method :path_to_asset, :asset_path
     
@@ -175,22 +178,6 @@ module Sprockets
     # returned by #environment.
     def assets_environment
       Helpers.environment || environment
-    end
-    
-    def materialize_path(source, options = {})
-      # If a manifest is present, try to grab the path from the manifest first
-      if Helpers.manifest && Helpers.manifest.assets[source]
-        return ManifestPath.new(Helpers.manifest.assets[source], options).to_s
-      end
-      
-      # If the source points to an asset in the Sprockets
-      # environment use AssetPath to generate the full path.
-      assets_environment.resolve(source) do |path|
-        return AssetPath.new(assets_environment[path], options).to_s
-      end
-      
-      # Use FilePath for normal files on the file system
-      FilePath.new(source, options).to_s
     end
   end
   

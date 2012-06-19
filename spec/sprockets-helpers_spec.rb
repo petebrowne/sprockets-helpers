@@ -63,9 +63,13 @@ describe Sprockets::Helpers do
       it 'sets a custom assets prefix' do
         within_construct do |c|
           c.file 'assets/logo.jpg'
+          c.file 'assets/font.eot'
+          c.file 'assets/font.svg'
 
-          Sprockets::Helpers.prefix = Proc.new { |source| "http://example.com/#{File.basename(source, '.jpg')}" }
+          Sprockets::Helpers.prefix = Proc.new { |source| "http://example.com/#{File.basename(source, File.extname(source))}" }
           context.asset_path('logo.jpg').should == 'http://example.com/logo/logo.jpg'
+          context.asset_path('font.eot?#iefix').should == 'http://example.com/font/font.eot?#iefix'
+          context.asset_path('font.svg#FontName').should == 'http://example.com/font/font.svg#FontName'
           Sprockets::Helpers.prefix = nil
         end
       end
@@ -119,9 +123,13 @@ describe Sprockets::Helpers do
         within_construct do |c|
           c.file 'public/main.js'
           c.file 'public/favicon.ico'
+          c.file 'public/font.eot'
+          c.file 'public/font.svg'
           
           context.asset_path('main', :ext => 'js').should =~ %r(/main.js\?\d+)
           context.asset_path('/favicon.ico').should =~ %r(/favicon.ico\?\d+)
+          context.asset_path('font.eot?#iefix').should =~ %r(/font.eot\?\d+#iefix)
+          context.asset_path('font.svg#FontName').should =~ %r(/font.svg\?\d+#FontName)
         end
       end
     end
@@ -151,19 +159,25 @@ describe Sprockets::Helpers do
       it 'uses the digest path if configured' do
         within_construct do |c|
           c.file 'assets/main.js'
-          c.file 'assets/main.eot'
+          c.file 'assets/font.eot'
+          c.file 'assets/font.svg'
           
           context.asset_path('main', :ext => 'js').should == '/assets/main.js'
           context.asset_path('main', :ext => 'js', :digest => true).should =~ %r(/assets/main-[0-9a-f]+.js)
-          context.asset_path('main.eot?#iefix', :digest => true).should =~ %r(/assets/main-[0-9a-f]+.eot\?#iefix)
+          context.asset_path('font.eot?#iefix', :digest => true).should =~ %r(/assets/font-[0-9a-f]+.eot\?#iefix)
+          context.asset_path('font.svg#FontName', :digest => true).should =~ %r(/assets/font-[0-9a-f]+.svg#FontName)
         end
       end
       
       it 'returns a body parameter' do
         within_construct do |c|
           c.file 'assets/main.js'
+          c.file 'assets/font.eot'
+          c.file 'assets/font.svg'
           
           context.asset_path('main', :ext => 'js', :body => true).should == '/assets/main.js?body=1'
+          context.asset_path('font.eot?#iefix', :body => true).should == '/assets/font.eot?body=1#iefix'
+          context.asset_path('font.svg#FontName', :body => true).should == '/assets/font.svg?body=1#FontName'
         end
       end
     end

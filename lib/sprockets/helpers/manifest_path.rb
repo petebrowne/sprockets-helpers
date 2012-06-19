@@ -4,13 +4,14 @@ module Sprockets
     # prepends the prefix.
     class ManifestPath < AssetPath
       #
-      def initialize(path, options = {})
+      def initialize(uri, path, options = {})
+        @uri     = uri
         @options = {
           :body   => false,
           :prefix => Helpers.prefix
         }.merge options
         
-        @source = path.to_s
+        @uri.path = path.to_s
       end
     end
   end
