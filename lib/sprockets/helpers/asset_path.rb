@@ -18,7 +18,7 @@ module Sprockets
       
       def rewrite_path
         prefix = if options[:prefix].respond_to? :call
-          warn 'DEPRECATION WARNING: Using a Proc for Sprockets::Helpers.prefix is deprecated and will be removed in 1.0. Please use Sprockets::Helpers.host instead.'
+          warn 'DEPRECATION WARNING: Using a Proc for Sprockets::Helpers.prefix is deprecated and will be removed in 1.0. Please use Sprockets::Helpers.asset_host instead.'
           options[:prefix].call uri.path
         else
           options[:prefix].to_s

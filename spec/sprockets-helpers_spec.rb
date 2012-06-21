@@ -45,45 +45,45 @@ describe Sprockets::Helpers do
     end
   end
   
-  describe '.host' do
+  describe '.asset_host' do
     context 'that is a string' do
-      it 'prepends the asset host' do
+      it 'prepends the asset_host' do
         within_construct do |c|
           c.file 'assets/main.js'
           c.file 'public/logo.jpg'
           
-          Sprockets::Helpers.host = 'assets.example.com'
+          Sprockets::Helpers.asset_host = 'assets.example.com'
           context.asset_path('main.js').should == 'http://assets.example.com/assets/main.js'
           context.asset_path('logo.jpg').should =~ %r(http://assets.example.com/logo.jpg\?\d+)
-          Sprockets::Helpers.host = nil
+          Sprockets::Helpers.asset_host = nil
         end
       end
       
       context 'with a wildcard' do
-        it 'cycles asset host between 0-3' do
+        it 'cycles asset_host between 0-3' do
           within_construct do |c|
             c.file 'assets/main.css'
             c.file 'public/logo.jpg'
             
-            Sprockets::Helpers.host = 'assets%d.example.com'
+            Sprockets::Helpers.asset_host = 'assets%d.example.com'
             context.asset_path('main.css').should =~ %r(http://assets[0-3].example.com/assets/main.css)
             context.asset_path('logo.jpg').should =~ %r(http://assets[0-3].example.com/logo.jpg\?\d+)
-            Sprockets::Helpers.host = nil
+            Sprockets::Helpers.asset_host = nil
           end
         end
       end
     end
     
     context 'that is a proc' do
-      it 'prepends the returned asset host' do
+      it 'prepends the returned asset_host' do
         within_construct do |c|
           c.file 'assets/main.js'
           c.file 'public/logo.jpg'
           
-          Sprockets::Helpers.host = Proc.new { |source| File.basename(source, File.extname(source)) + '.assets.example.com' }
+          Sprockets::Helpers.asset_host = Proc.new { |source| File.basename(source, File.extname(source)) + '.assets.example.com' }
           context.asset_path('main.js').should == 'http://main.assets.example.com/assets/main.js'
           context.asset_path('logo.jpg').should =~ %r(http://logo.assets.example.com/logo.jpg\?\d+)
-          Sprockets::Helpers.host = nil
+          Sprockets::Helpers.asset_host = nil
         end
       end
     end
@@ -103,17 +103,17 @@ describe Sprockets::Helpers do
   end
   
   describe '.protocol' do
-    it 'sets the protocol to use with asset hosts' do
+    it 'sets the protocol to use with asset_hosts' do
       within_construct do |c|
         c.file 'assets/main.js'
         c.file 'public/logo.jpg'
         
-        Sprockets::Helpers.host     = 'assets.example.com'
-        Sprockets::Helpers.protocol = 'https'
+        Sprockets::Helpers.asset_host = 'assets.example.com'
+        Sprockets::Helpers.protocol   = 'https'
         context.asset_path('main.js').should == 'https://assets.example.com/assets/main.js'
         context.asset_path('logo.jpg').should =~ %r(https://assets.example.com/logo.jpg\?\d+)
-        Sprockets::Helpers.host     = nil
-        Sprockets::Helpers.protocol = nil
+        Sprockets::Helpers.asset_host = nil
+        Sprockets::Helpers.protocol   = nil
       end
     end
     
@@ -123,12 +123,12 @@ describe Sprockets::Helpers do
           c.file 'assets/main.js'
           c.file 'public/logo.jpg'
           
-          Sprockets::Helpers.host     = 'assets.example.com'
-          Sprockets::Helpers.protocol = :relative
+          Sprockets::Helpers.asset_host = 'assets.example.com'
+          Sprockets::Helpers.protocol   = :relative
           context.asset_path('main.js').should == '//assets.example.com/assets/main.js'
           context.asset_path('logo.jpg').should =~ %r(\A//assets.example.com/logo.jpg\?\d+)
-          Sprockets::Helpers.host     = nil
-          Sprockets::Helpers.protocol = nil
+          Sprockets::Helpers.asset_host = nil
+          Sprockets::Helpers.protocol   = nil
         end
       end
     end

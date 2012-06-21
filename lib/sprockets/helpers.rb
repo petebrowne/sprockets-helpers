@@ -9,15 +9,15 @@ require 'uri'
 module Sprockets
   module Helpers
     class << self
+      # Link to assets from a dedicated server.
+      attr_accessor :asset_host
+      
       # When true, the asset paths will return digest paths.
       attr_accessor :digest
       
       # Set the Sprockets environment to search for assets.
       # This defaults to the context's #environment method.
       attr_accessor :environment
-      
-      # Link to assets from a dedicated server.
-      attr_accessor :host
       
       # The manifest file used for lookup
       attr_accessor :manifest

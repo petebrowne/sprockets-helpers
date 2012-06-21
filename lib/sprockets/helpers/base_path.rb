@@ -39,7 +39,7 @@ module Sprockets
       
       # Hook for rewriting the host.
       def rewrite_host # :nodoc:
-        if host = compute_host
+        if host = compute_asset_host
           uri.host   = host
           uri.scheme = compute_scheme
         end
@@ -50,8 +50,8 @@ module Sprockets
       # numbers 0-3 if it contains <tt>%d</tt> (the number is the source hash mod 4),
       # or the value returned from invoking call on an object responding to call
       # (proc or otherwise).
-      def compute_host # :nodoc:
-        if host = options[:host] || Helpers.host
+      def compute_asset_host # :nodoc:
+        if host = options[:asset_host] || Helpers.asset_host
           if host.respond_to?(:call)
             host.call(uri.to_s)
           elsif host =~ /%d/
