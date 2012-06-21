@@ -90,32 +90,14 @@ describe Sprockets::Helpers do
   end
   
   describe '.prefix' do
-    context 'that is a string' do
-      it 'sets a custom assets prefix' do
-        within_construct do |c|
-          c.file 'assets/logo.jpg'
-
-          context.asset_path('logo.jpg').should == '/assets/logo.jpg'
-          Sprockets::Helpers.prefix = '/images'
-          context.asset_path('logo.jpg').should == '/images/logo.jpg'
-          Sprockets::Helpers.prefix = nil
-        end
-      end
-    end
-
-    context 'that is a proc' do
-      it 'sets a custom assets prefix' do
-        within_construct do |c|
-          c.file 'assets/logo.jpg'
-          c.file 'assets/font.eot'
-          c.file 'assets/font.svg'
-
-          Sprockets::Helpers.prefix = Proc.new { |source| "http://example.com/#{File.basename(source, File.extname(source))}" }
-          context.asset_path('logo.jpg').should == 'http://example.com/logo/logo.jpg'
-          context.asset_path('font.eot?#iefix').should == 'http://example.com/font/font.eot?#iefix'
-          context.asset_path('font.svg#FontName').should == 'http://example.com/font/font.svg#FontName'
-          Sprockets::Helpers.prefix = nil
-        end
+    it 'sets a custom assets prefix' do
+      within_construct do |c|
+        c.file 'assets/logo.jpg'
+        
+        context.asset_path('logo.jpg').should == '/assets/logo.jpg'
+        Sprockets::Helpers.prefix = '/images'
+        context.asset_path('logo.jpg').should == '/images/logo.jpg'
+        Sprockets::Helpers.prefix = nil
       end
     end
   end
@@ -264,19 +246,19 @@ describe Sprockets::Helpers do
           within_construct do |c|
             asset_file    = c.file 'assets/application.js'
             manifest_file = c.join 'manifest.json'
-        
+            
             manifest = Sprockets::Manifest.new(env, manifest_file)
             manifest.compile 'application.js'
-
+            
             Sprockets::Helpers.configure do |config|
               config.digest   = true
               config.prefix   = '/assets'
               config.manifest = Sprockets::Manifest.new(env, manifest_file)
             end
-              
+            
             asset_file.delete
-            context.asset_path('application.js').should =~ %r(/assets/application-[0-9a-f]+.js)        
-
+            context.asset_path('application.js').should =~ %r(/assets/application-[0-9a-f]+.js)
+            
             Sprockets::Helpers.digest = nil
             Sprockets::Helpers.prefix = nil
           end

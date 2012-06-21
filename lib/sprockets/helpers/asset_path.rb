@@ -1,11 +1,8 @@
-require 'uri'
-
 module Sprockets
   module Helpers
     # `AssetPath` generates a full path for an asset
     # that exists in Sprockets environment.
-    class AssetPath < FilePath
-      #
+    class AssetPath < BasePath
       def initialize(uri, asset, options = {})
         @uri     = uri
         @options = {
@@ -19,9 +16,9 @@ module Sprockets
       
       protected
       
-      # Prepends the assets prefix
-      def rewrite_base_path # :nodoc:
+      def rewrite_path
         prefix = if options[:prefix].respond_to? :call
+          warn 'DEPRECATION WARNING: Using a Proc for Sprockets::Helpers.prefix is deprecated and will be removed in 1.0. Please use Sprockets::Helpers.host instead.'
           options[:prefix].call uri.path
         else
           options[:prefix].to_s
@@ -30,7 +27,6 @@ module Sprockets
         prepend_path(prefix)
       end
       
-      # Rewrite the query string to inlcude body flag if necessary.
       def rewrite_query
         append_query('body=1') if options[:body]
       end

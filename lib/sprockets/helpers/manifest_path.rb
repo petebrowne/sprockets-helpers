@@ -3,7 +3,6 @@ module Sprockets
     # `ManifestPath` uses the digest path and
     # prepends the prefix.
     class ManifestPath < AssetPath
-      #
       def initialize(uri, path, options = {})
         @uri     = uri
         @options = {

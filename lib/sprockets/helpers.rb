@@ -1,13 +1,13 @@
-require 'sprockets/helpers/version'
 require 'sprockets'
+require 'sprockets/helpers/version'
+require 'sprockets/helpers/base_path'
+require 'sprockets/helpers/asset_path'
+require 'sprockets/helpers/file_path'
+require 'sprockets/helpers/manifest_path'
 require 'uri'
 
 module Sprockets
   module Helpers
-    autoload :AssetPath,    'sprockets/helpers/asset_path'
-    autoload :FilePath,     'sprockets/helpers/file_path'
-    autoload :ManifestPath, 'sprockets/helpers/manifest_path'
-    
     class << self
       # When true, the asset paths will return digest paths.
       attr_accessor :digest
