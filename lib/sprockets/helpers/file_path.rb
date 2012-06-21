@@ -1,3 +1,5 @@
+require 'zlib'
+
 module Sprockets
   module Helpers
     # `FilePath` generates a full path for a regular file
@@ -26,30 +28,66 @@ module Sprockets
       def to_s
         rewrite_base_path
         rewrite_query
+        rewrite_host_and_protocol
         uri.to_s
       end
       
       protected
       
-      # Prepends the base path if the path is not
-      # already an absolute path.
+      # Hook for rewriting the base path.
       def rewrite_base_path # :nodoc:
         if uri.path[0] != ?/
           prepend_path(File.join('/', dir))
         end
       end
       
-      # Appends an asset timestamp based on the
-      # modification time of the asset.
+      # Hook for rewriting the query string.
       def rewrite_query # :nodoc:
-        if timestamp = mtime
+        if timestamp = compute_mtime
           append_query(timestamp.to_i.to_s)
+        end
+      end
+      
+      # Hook for rewriting the host and protocol.
+      def rewrite_host_and_protocol # :nodoc:
+        if host = compute_host
+          uri.host   = host
+          uri.scheme = compute_scheme
+        end
+      end
+      
+      # Pick an asset host for this source. Returns +nil+ if no host is set,
+      # the host if no wildcard is set, the host interpolated with the
+      # numbers 0-3 if it contains <tt>%d</tt> (the number is the source hash mod 4),
+      # or the value returned from invoking call on an object responding to call
+      # (proc or otherwise).
+      def compute_host # :nodoc:
+        if host = options[:host] || Helpers.host
+          if host.respond_to?(:call)
+            host.call(uri.to_s)
+          elsif host =~ /%d/
+            host % (Zlib.crc32(uri.to_s) % 4)
+          else
+            host
+          end
+        end
+      end
+      
+      # Pick a scheme for the protocol if we are using
+      # an asset host.
+      def compute_scheme # :nodoc:
+        protocol = options[:protocol] || Helpers.protocol
+        
+        if protocol.nil? || protocol == :relative
+          nil
+        else
+          protocol.to_s.sub %r{://\z}, ''
         end
       end
       
       # Returns the mtime for the given path (relative to
       # the output path). Returns nil if the file doesn't exist.
-      def mtime # :nodoc:
+      def compute_mtime # :nodoc:
         public_path = File.join(Helpers.public_path, uri.path)
         
         if File.exist?(public_path)

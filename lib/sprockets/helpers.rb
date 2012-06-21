@@ -15,16 +15,27 @@ module Sprockets
       # Set the Sprockets environment to search for assets.
       # This defaults to the context's #environment method.
       attr_accessor :environment
-
+      
+      # Link to assets from a dedicated server.
+      attr_accessor :host
+      
       # The manifest file used for lookup
       attr_accessor :manifest
-
+      
       # The base URL the Sprocket environment is mapped to.
       # This defaults to '/assets'.
       def prefix
         @prefix ||= '/assets'
       end
       attr_writer :prefix
+      
+      # Customize the protocol when using asset hosts.
+      # If the value is :relative, A relative protocol ('//')
+      # will be used.
+      def protocol
+        @protocol ||= 'http://'
+      end
+      attr_writer :protocol
       
       # The path to the public directory, where the assets
       # not managed by Sprockets will be located.
