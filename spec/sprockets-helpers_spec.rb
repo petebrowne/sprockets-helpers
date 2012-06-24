@@ -298,4 +298,14 @@ describe Sprockets::Helpers do
       end
     end
   end
+
+  describe '#font_path' do
+    context 'with regular files' do
+      it 'prepends the fonts dir' do
+        context.font_path('font.ttf').should == '/fonts/font.ttf'
+      end
+    end
+  end
+
+
 end
