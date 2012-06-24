@@ -202,7 +202,7 @@ module Sprockets
     #   font_path 'http://www.example.com/img/font.ttf' # => 'http://www.example.com/img/font.ttf'
     #
     def font_path(source, options = {})
-      asset_path source, { :dir => 'font' }.merge(options)
+      asset_path source, { :dir => 'fonts' }.merge(options)
     end
     alias_method :path_to_font, :font_path
     
