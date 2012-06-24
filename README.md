@@ -1,16 +1,16 @@
 sprockets-helpers
 =================
 
-**Asset path helpers for Sprockets 2.0 applications**
+**Asset path helpers for Sprockets 2.x applications**
 
-Sprockets::Helpers adds the asset_path helpers, familiar to Rails developers, to Sprockets 2.0 assets and application.
+Sprockets::Helpers adds the asset_path helpers, familiar to Rails developers, to Sprockets 2.x assets and applications.
 
 ### Features
 
-* Includes image_path, javascript_path, & stylesheet_path helpers.
+* Includes helpers for image, javascript, stylesheet, font, video, & audio assets.
 * Automatically appends extension if necessary.
 * Optionally outputs digest paths.
-* Falls back to file paths in the public directory.
+* Falls back to file paths in the public directory & adds cache busting timestamp.
 
 
 Installation

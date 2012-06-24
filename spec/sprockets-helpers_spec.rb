@@ -298,7 +298,7 @@ describe Sprockets::Helpers do
       end
     end
   end
-
+  
   describe '#font_path' do
     context 'with regular files' do
       it 'prepends the fonts dir' do
@@ -306,6 +306,20 @@ describe Sprockets::Helpers do
       end
     end
   end
-
-
+  
+  describe '#video_path' do
+    context 'with regular files' do
+      it 'prepends the videos dir' do
+        context.video_path('video.mp4').should == '/videos/video.mp4'
+      end
+    end
+  end
+  
+  describe '#audio_path' do
+    context 'with regular files' do
+      it 'prepends the audios dir' do
+        context.audio_path('audio.mp3').should == '/audios/audio.mp3'
+      end
+    end
+  end
 end

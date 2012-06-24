@@ -107,6 +107,78 @@ module Sprockets
     end
     alias_method :path_to_asset, :asset_path
     
+    # Computes the path to a audio asset either in the Sprockets environment
+    # or the public directory. External URIs are untouched.
+    #
+    # ==== Examples
+    #
+    # With files within Sprockets:
+    #
+    #   audio_path 'audio.mp3'            # => '/assets/audio.mp3'
+    #   audio_path 'subfolder/audio.mp3'  # => '/assets/subfolder/audio.mp3'
+    #   audio_path '/subfolder/audio.mp3' # => '/assets/subfolder/audio.mp3'
+    #
+    # With files outside of Sprockets:
+    #
+    #   audio_path 'audio'                                # => '/audios/audio'
+    #   audio_path 'audio.mp3'                            # => '/audios/audio.mp3'
+    #   audio_path 'subfolder/audio.mp3'                  # => '/audios/subfolder/audio.mp3'
+    #   audio_path '/subfolder/audio.mp3                  # => '/subfolder/audio.mp3'
+    #   audio_path 'http://www.example.com/img/audio.mp3' # => 'http://www.example.com/img/audio.mp3'
+    #
+    def audio_path(source, options = {})
+      asset_path source, { :dir => 'audios' }.merge(options)
+    end
+    alias_method :path_to_audio, :audio_path
+    
+    # Computes the path to a font asset either in the Sprockets environment
+    # or the public directory. External URIs are untouched.
+    #
+    # ==== Examples
+    #
+    # With files within Sprockets:
+    #
+    #   font_path 'font.ttf'            # => '/assets/font.ttf'
+    #   font_path 'subfolder/font.ttf'  # => '/assets/subfolder/font.ttf'
+    #   font_path '/subfolder/font.ttf' # => '/assets/subfolder/font.ttf'
+    #
+    # With files outside of Sprockets:
+    #
+    #   font_path 'font'                                # => '/fonts/font'
+    #   font_path 'font.ttf'                            # => '/fonts/font.ttf'
+    #   font_path 'subfolder/font.ttf'                  # => '/fonts/subfolder/font.ttf'
+    #   font_path '/subfolder/font.ttf                  # => '/subfolder/font.ttf'
+    #   font_path 'http://www.example.com/img/font.ttf' # => 'http://www.example.com/img/font.ttf'
+    #
+    def font_path(source, options = {})
+      asset_path source, { :dir => 'fonts' }.merge(options)
+    end
+    alias_method :path_to_font, :font_path
+    
+    # Computes the path to an image asset either in the Sprockets environment
+    # or the public directory. External URIs are untouched.
+    #
+    # ==== Examples
+    #
+    # With files within Sprockets:
+    #
+    #   image_path 'edit.png'        # => '/assets/edit.png'
+    #   image_path 'icons/edit.png'  # => '/assets/icons/edit.png'
+    #   image_path '/icons/edit.png' # => '/assets/icons/edit.png'
+    #
+    # With files outside of Sprockets:
+    #
+    #   image_path 'edit'                                # => '/images/edit'
+    #   image_path 'edit.png'                            # => '/images/edit.png'
+    #   image_path 'icons/edit.png'                      # => '/images/icons/edit.png'
+    #   image_path '/icons/edit.png'                     # => '/icons/edit.png'
+    #   image_path 'http://www.example.com/img/edit.png' # => 'http://www.example.com/img/edit.png'
+    #
+    def image_path(source, options = {})
+      asset_path source, { :dir => 'images' }.merge(options)
+    end
+    alias_method :path_to_image, :image_path
+    
     # Computes the path to a javascript asset either in the Sprockets
     # environment or the public directory. If the +source+ filename has no extension,
     # <tt>.js</tt> will be appended. External URIs are untouched.
@@ -157,54 +229,29 @@ module Sprockets
     end
     alias_method :path_to_stylesheet, :stylesheet_path
     
-    # Computes the path to an image asset either in the Sprockets environment
+    # Computes the path to a video asset either in the Sprockets environment
     # or the public directory. External URIs are untouched.
     #
     # ==== Examples
     #
     # With files within Sprockets:
     #
-    #   image_path 'edit.png'        # => '/assets/edit.png'
-    #   image_path 'icons/edit.png'  # => '/assets/icons/edit.png'
-    #   image_path '/icons/edit.png' # => '/assets/icons/edit.png'
+    #   video_path 'video.mp4'            # => '/assets/video.mp4'
+    #   video_path 'subfolder/video.mp4'  # => '/assets/subfolder/video.mp4'
+    #   video_path '/subfolder/video.mp4' # => '/assets/subfolder/video.mp4'
     #
     # With files outside of Sprockets:
     #
-    #   image_path 'edit'                                # => '/images/edit'
-    #   image_path 'edit.png'                            # => '/images/edit.png'
-    #   image_path 'icons/edit.png'                      # => '/images/icons/edit.png'
-    #   image_path '/icons/edit.png'                     # => '/icons/edit.png'
-    #   image_path 'http://www.example.com/img/edit.png' # => 'http://www.example.com/img/edit.png'
+    #   video_path 'video'                                # => '/videos/video'
+    #   video_path 'video.mp4'                            # => '/videos/video.mp4'
+    #   video_path 'subfolder/video.mp4'                  # => '/videos/subfolder/video.mp4'
+    #   video_path '/subfolder/video.mp4                  # => '/subfolder/video.mp4'
+    #   video_path 'http://www.example.com/img/video.mp4' # => 'http://www.example.com/img/video.mp4'
     #
-    def image_path(source, options = {})
-      asset_path source, { :dir => 'images' }.merge(options)
+    def video_path(source, options = {})
+      asset_path source, { :dir => 'videos' }.merge(options)
     end
-    alias_method :path_to_image, :image_path
-
-
-    # Computes the path to a font asset either in the Sprockets environment
-    # or the public directory. External URIs are untouched.
-    #
-    # ==== Examples
-    #
-    # With files within Sprockets:
-    #
-    #   font_path 'font.ttf'            # => '/assets/font.ttf'
-    #   font_path 'subfolder/font.ttf'  # => '/assets/subfolder/font.ttf'
-    #   font_path '/subfolder/font.ttf' # => '/assets/subfolder/font.ttf'
-    #
-    # With files outside of Sprockets:
-    #
-    #   font_path 'font'                                # => '/fonts/font'
-    #   font_path 'font.ttf'                            # => '/fonts/font.ttf'
-    #   font_path 'subfolder/font.ttf'                  # => '/fonts/icons/font.ttf'
-    #   font_path '/subfolder/font.ttf                  # => '/subfolder/font.ttf'
-    #   font_path 'http://www.example.com/img/font.ttf' # => 'http://www.example.com/img/font.ttf'
-    #
-    def font_path(source, options = {})
-      asset_path source, { :dir => 'fonts' }.merge(options)
-    end
-    alias_method :path_to_font, :font_path
+    alias_method :path_to_video, :video_path
     
     protected
     
