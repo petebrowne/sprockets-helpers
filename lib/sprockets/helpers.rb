@@ -180,6 +180,31 @@ module Sprockets
       asset_path source, { :dir => 'images' }.merge(options)
     end
     alias_method :path_to_image, :image_path
+
+
+    # Computes the path to a font asset either in the Sprockets environment
+    # or the public directory. External URIs are untouched.
+    #
+    # ==== Examples
+    #
+    # With files within Sprockets:
+    #
+    #   font_path 'font.ttf'            # => '/assets/font.ttf'
+    #   font_path 'subfolder/font.ttf'  # => '/assets/subfolder/font.ttf'
+    #   font_path '/subfolder/font.ttf' # => '/assets/subfolder/font.ttf'
+    #
+    # With files outside of Sprockets:
+    #
+    #   font_path 'font'                                # => '/fonts/font'
+    #   font_path 'font.ttf'                            # => '/fonts/font.ttf'
+    #   font_path 'subfolder/font.ttf'                  # => '/fonts/icons/font.ttf'
+    #   font_path '/subfolder/font.ttf                  # => '/subfolder/font.ttf'
+    #   font_path 'http://www.example.com/img/font.ttf' # => 'http://www.example.com/img/font.ttf'
+    #
+    def font_path(source, options = {})
+      asset_path source, { :dir => 'font' }.merge(options)
+    end
+    alias_method :path_to_font, :font_path
     
     protected
     
