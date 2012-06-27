@@ -81,7 +81,7 @@ module Sprockets
     #   asset_path 'http://www.example.com/js/xmlhr.js'   # => 'http://www.example.com/js/xmlhr.js'
     # 
     def asset_path(source, options = {})
-      uri = URI.parse(source)
+      uri = URI.parse(URI.escape(source))
       
       # Return fast if the URI is absolute
       return source if uri.absolute?
