@@ -271,10 +271,12 @@ describe Sprockets::Helpers do
     context 'with regular files' do
       it 'appends the js extension' do
         context.javascript_path('/path/to/file').should == '/path/to/file.js'
+        context.javascript_path('/path/to/file.min').should == '/path/to/file.min.js'
       end
       
       it 'prepends the javascripts dir' do
         context.javascript_path('main').should == '/javascripts/main.js'
+        context.javascript_path('main.min').should == '/javascripts/main.min.js'
       end
     end
   end
@@ -283,10 +285,12 @@ describe Sprockets::Helpers do
     context 'with regular files' do
       it 'appends the css extension' do
         context.stylesheet_path('/path/to/file').should == '/path/to/file.css'
+        context.stylesheet_path('/path/to/file.min').should == '/path/to/file.min.css'
       end
       
       it 'prepends the stylesheets dir' do
         context.stylesheet_path('main').should == '/stylesheets/main.css'
+        context.stylesheet_path('main.min').should == '/stylesheets/main.min.css'
       end
     end
   end
