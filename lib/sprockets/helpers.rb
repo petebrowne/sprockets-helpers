@@ -87,7 +87,8 @@ module Sprockets
       return source if uri.absolute?
       
       # Append extension if necessary
-      if options[:ext] && File.extname(uri.path).empty?
+      source_ext = File.extname(source)
+      if options[:ext] && source_ext != ".#{options[:ext]}"
         uri.path << ".#{options[:ext]}"
       end
       
