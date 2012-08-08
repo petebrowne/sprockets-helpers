@@ -92,8 +92,21 @@ module Sprockets
         uri.path << ".#{options[:ext]}"
       end
       
+      try_manifest = true
+
+      if defined?(params) && params[:debug_assets]
+        try_manifest = false
+        
+        # override digest setting
+        options[:digest] = false 
+
+        # grab asset from local server instead of asset host
+        options[:asset_host] = ""        
+      end
+
       # If a manifest is present, try to grab the path from the manifest first
-      if Helpers.manifest && Helpers.manifest.assets[uri.path]
+      # Don't try looking in manifest in the first place if we're not looking for digest version
+      if try_manifest && Helpers.manifest && Helpers.manifest.assets[uri.path]
         return ManifestPath.new(uri, Helpers.manifest.assets[uri.path], options).to_s
       end
       
@@ -102,9 +115,9 @@ module Sprockets
       assets_environment.resolve(uri.path) do |path|
         return AssetPath.new(uri, assets_environment[path], options).to_s
       end
-      
+
       # Use FilePath for normal files on the file system
-      FilePath.new(uri, options).to_s
+      return FilePath.new(uri, options).to_s
     end
     alias_method :path_to_asset, :asset_path
     
