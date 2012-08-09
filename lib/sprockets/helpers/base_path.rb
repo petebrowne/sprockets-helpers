@@ -56,6 +56,8 @@ module Sprockets
             host.call(uri.to_s)
           elsif host =~ /%d/
             host % (Zlib.crc32(uri.to_s) % 4)
+          elsif host.empty?
+            nil
           else
             host
           end

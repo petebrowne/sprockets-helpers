@@ -163,7 +163,7 @@ describe Sprockets::Helpers do
       it 'returns absolute paths' do
         context.asset_path('/path/to/file.js').should == '/path/to/file.js'
         context.asset_path('/path/to/file.jpg').should == '/path/to/file.jpg'
-        context.asset_path('/path/to/file.eot?#iefix').should == '/path/to/file.eot?#iefix'
+        context.asset_path('/path/to/file.eot?#iefix').should == '/path/to/file.eot?%23iefix'
       end
       
       it 'appends the extension for javascripts and stylesheets' do
@@ -186,8 +186,8 @@ describe Sprockets::Helpers do
           
           context.asset_path('main', :ext => 'js').should =~ %r(/main.js\?\d+)
           context.asset_path('/favicon.ico').should =~ %r(/favicon.ico\?\d+)
-          context.asset_path('font.eot?#iefix').should =~ %r(/font.eot\?\d+#iefix)
-          context.asset_path('font.svg#FontName').should =~ %r(/font.svg\?\d+#FontName)
+          context.asset_path('font.eot?#iefix').should =~ %r(/font.eot\?\%23iefix\&\d+)
+          context.asset_path('font.svg#FontName').should =~ %r(/font.svg\?\d+%23FontName)
         end
       end
     end
@@ -222,7 +222,7 @@ describe Sprockets::Helpers do
           
           context.asset_path('main', :ext => 'js').should == '/assets/main.js'
           context.asset_path('main', :ext => 'js', :digest => true).should =~ %r(/assets/main-[0-9a-f]+.js)
-          context.asset_path('font.eot?#iefix', :digest => true).should =~ %r(/assets/font-[0-9a-f]+.eot\?#iefix)
+          context.asset_path('font.eot?#iefix', :digest => true).should =~ %r(/assets/font-[0-9a-f]+.eot\?\%23iefix)
           context.asset_path('font.svg#FontName', :digest => true).should =~ %r(/assets/font-[0-9a-f]+.svg#FontName)
         end
       end
