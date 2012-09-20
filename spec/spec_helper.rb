@@ -9,7 +9,7 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 RSpec.configure do |config|
   config.include Construct::Helpers
-  
+
   # Returns a Sprockets environment. Automatically
   # appends the 'assets' path if available.
   def env
@@ -17,7 +17,7 @@ RSpec.configure do |config|
       env.append_path 'assets' if File.directory?('assets')
     end
   end
-  
+
   # Returns a fresh context, that can be used to test helpers.
   def context(logical_path = 'application.js', pathname = nil)
     pathname ||= Pathname.new(File.join('assets', logical_path)).expand_path
