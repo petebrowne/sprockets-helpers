@@ -49,10 +49,20 @@ module Sprockets
       def configure
         yield self
       end
-    end
-  end
 
-  class Context
+      # Hack to ensure methods from Sprockets::Helpers override the
+      # methods of Sprockets::Context when included.
+      def append_features(context) # :nodoc:
+        context.class_eval do
+          Helpers.public_instance_methods.each do |method|
+            remove_method(method) if method_defined?(method)
+          end
+        end
+
+        super(context)
+      end
+    end
+
     # Returns the path to an asset either in the Sprockets environment
     # or the public directory. External URIs are untouched.
     #
@@ -273,5 +283,9 @@ module Sprockets
     def assets_environment
       Helpers.environment || environment
     end
+  end
+
+  class Context
+    include Helpers
   end
 end
