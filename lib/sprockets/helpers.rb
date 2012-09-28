@@ -54,8 +54,9 @@ module Sprockets
       # methods of Sprockets::Context when included.
       def append_features(context) # :nodoc:
         context.class_eval do
+          context_methods = context.instance_methods(false)
           Helpers.public_instance_methods.each do |method|
-            remove_method(method) if method_defined?(method)
+            remove_method(method) if context_methods.include?(method)
           end
         end
 
