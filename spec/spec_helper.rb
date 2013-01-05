@@ -23,4 +23,26 @@ RSpec.configure do |config|
     pathname ||= Pathname.new(File.join('assets', logical_path)).expand_path
     env.context_class.new env, logical_path, pathname
   end
+
+  # Exemplary file system layout for usage in test-construct
+  def assets_layout(construct)
+    lambda { |c|
+      c.file('assets/main.js') do |f|
+        f << "//= require a\n"
+        f << "//= require b\n"
+      end
+      c.file('assets/a.js')
+      c.file('assets/b.js')
+
+      c.file('assets/main.css') do |f|
+        f << "/*\n"
+        f << "*= require a\n"
+        f << "*= require b\n"
+        f << "*/\n"
+      end
+      c.file('assets/a.css')
+      c.file('assets/b.css')
+    }.call(construct)
+  end
+
 end
