@@ -15,6 +15,9 @@ module Sprockets
       # When true, the asset paths will return digest paths.
       attr_accessor :digest
 
+      # When true, expand assets.
+      attr_accessor :expand
+
       # Set the Sprockets environment to search for assets.
       # This defaults to the context's #environment method.
       attr_accessor :environment
@@ -120,7 +123,15 @@ module Sprockets
 
       # If the source points to an asset in the Sprockets
       # environment use AssetPath to generate the full path.
+      # With expand, return array of paths of assets required by asset.
       assets_environment.resolve(uri.path) do |path|
+        if options[:expand]
+          assets = assets_environment[path].to_a
+          paths = assets.map do |asset|
+            Helpers::AssetPath.new(uri.clone, asset, options.merge({:body => true})).to_s
+          end
+          return paths
+        end
         return Helpers::AssetPath.new(uri, assets_environment[path], options).to_s
       end
 
@@ -128,6 +139,35 @@ module Sprockets
       return Helpers::FilePath.new(uri, options).to_s
     end
     alias_method :path_to_asset, :asset_path
+
+    def asset_tag(source, options = {}, &block)
+      raise ::ArgumentError, "block missing" unless block
+      options.merge!({:expand => true}) if Helpers.expand
+      if options[:expand]
+        paths = asset_path(source, options)
+        if paths.kind_of?(Array)
+          paths.map! do |path|
+            block.call(path)
+          end
+          return paths.join()
+        end
+      end
+      yield asset_path(source, options)
+    end
+
+    def javascript_tag(source, options = {})
+      options.merge!({:ext => 'js'})
+      asset_tag(source, options) do |path|
+        %Q(<script src="#{path}"></script>)
+      end
+    end
+
+    def stylesheet_tag(source, options = {})
+      options.merge!({:ext => 'css'})
+      asset_tag(source, options) do |path|
+        %Q(<link rel="stylesheet" href="#{path}">)
+      end
+    end
 
     # Computes the path to a audio asset either in the Sprockets environment
     # or the public directory. External URIs are untouched.
