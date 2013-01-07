@@ -371,4 +371,93 @@ describe Sprockets::Helpers do
       end
     end
   end
+
+  describe '#asset_tag' do
+    it 'receives block to generate tag' do
+      actual = context.asset_tag('main.js') { |path| "<script src=#{path}></script>" }
+      actual.should == '<script src=/main.js></script>'
+    end
+
+    it 'raises when called without block' do
+      expect { context.asset_tag('main.js') }.to raise_error(ArgumentError, "block missing")
+    end
+
+    it 'expands when configured' do
+      within_construct do |construct|
+        assets_layout(construct)
+        Sprockets::Helpers.expand = true
+        c = context
+        c.stub(:asset_path).and_return(context.asset_path("main.js")) # Spy
+        c.should_receive(:asset_path).with('main.js', {:expand => true})
+        c.asset_tag('main.js') {}
+        Sprockets::Helpers.expand = false
+        c.should_receive(:asset_path).with('main.js', {})
+        c.asset_tag('main.js') {}
+      end
+    end
+
+    describe 'when expanding' do
+      it 'passes uri that is no asset untouched' do
+        context.asset_tag('main.js', :expand => true) {}
+      end
+
+      it 'generates tag for each asset' do
+        within_construct do |construct|
+          assets_layout(construct)
+          tags = context.asset_tag('main.js', :expand => true) do |path|
+            "<script src=\"#{path}\"></script>"
+          end
+          tags.split("</script>").should have(3).scripts
+          tags.should include('<script src="/assets/main.js?body=1"></script>')
+          tags.should include('<script src="/assets/a.js?body=1"></script>')
+          tags.should include('<script src="/assets/b.js?body=1"></script>')
+        end
+      end
+
+    end
+  end
+
+  describe '#javascript_tag' do
+    it 'generates script tag' do
+      context.javascript_tag('main.js').should == '<script src="/main.js"></script>'
+    end
+
+    it 'appends extension' do
+      context.javascript_tag('main').should == '<script src="/main.js"></script>'
+    end
+
+    describe 'when expanding' do
+      it 'generates script tag for each javascript asset' do
+        within_construct do |construct|
+          assets_layout(construct)
+          tags = context.javascript_tag('main.js', :expand => true)
+          tags.should include('<script src="/assets/main.js?body=1"></script>')
+          tags.should include('<script src="/assets/a.js?body=1"></script>')
+          tags.should include('<script src="/assets/b.js?body=1"></script>')
+        end
+      end
+    end
+  end
+
+  describe '#stylesheet_tag' do
+    it 'generates stylesheet tag' do
+      context.stylesheet_tag('main.css').should == '<link rel="stylesheet" href="/main.css">'
+    end
+
+    it 'generates stylesheet tag' do
+      context.stylesheet_tag('main').should == '<link rel="stylesheet" href="/main.css">'
+    end
+
+    describe 'when expanding' do
+      it 'generates stylesheet tag for each stylesheet asset' do
+        within_construct do |construct|
+          assets_layout(construct)
+          tags = context.stylesheet_tag('main.css', :expand => true)
+          tags.should include('<link rel="stylesheet" href="/assets/main.css?body=1">')
+          tags.should include('<link rel="stylesheet" href="/assets/a.css?body=1">')
+          tags.should include('<link rel="stylesheet" href="/assets/b.css?body=1">')
+        end
+      end
+    end
+  end
 end
