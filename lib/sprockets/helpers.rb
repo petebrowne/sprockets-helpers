@@ -48,6 +48,20 @@ module Sprockets
       end
       attr_writer :public_path
 
+      # The default options for each asset path method. This is where you
+      # can change your default directories for the fallback directory.
+      def default_path_options
+        @default_path_options ||= {
+          :audio_path => { :dir => 'audios' },
+          :font_path => { :dir => 'fonts' },
+          :image_path => { :dir => 'images' },
+          :javascript_path => { :dir => 'javascripts', :ext => 'js' },
+          :stylesheet_path => { :dir => 'stylesheets', :ext => 'css' },
+          :video_path => { :dir => 'videos' }
+        }
+      end
+      attr_writer :default_path_options
+
       # Convience method for configuring Sprockets::Helpers.
       def configure
         yield self
@@ -131,13 +145,15 @@ module Sprockets
     end
 
     def javascript_tag(source, options = {})
-      asset_tag(source, { :ext => 'js' }.merge(options)) do |path|
+      options = Helpers.default_path_options[:javascript_path].merge(options)
+      asset_tag(source, options) do |path|
         %Q(<script src="#{path}"></script>)
       end
     end
 
     def stylesheet_tag(source, options = {})
-      asset_tag(source, { :ext => 'css' }.merge(options)) do |path|
+      options = Helpers.default_path_options[:stylesheet_path].merge(options)
+      asset_tag(source, options) do |path|
         %Q(<link rel="stylesheet" href="#{path}">)
       end
     end
@@ -162,7 +178,7 @@ module Sprockets
     #   audio_path 'http://www.example.com/img/audio.mp3' # => 'http://www.example.com/img/audio.mp3'
     #
     def audio_path(source, options = {})
-      asset_path source, { :dir => 'audios' }.merge(options)
+      asset_path source, Helpers.default_path_options[:audio_path].merge(options)
     end
     alias_method :path_to_audio, :audio_path
 
@@ -186,7 +202,7 @@ module Sprockets
     #   font_path 'http://www.example.com/img/font.ttf' # => 'http://www.example.com/img/font.ttf'
     #
     def font_path(source, options = {})
-      asset_path source, { :dir => 'fonts' }.merge(options)
+      asset_path source, Helpers.default_path_options[:font_path].merge(options)
     end
     alias_method :path_to_font, :font_path
 
@@ -210,7 +226,7 @@ module Sprockets
     #   image_path 'http://www.example.com/img/edit.png' # => 'http://www.example.com/img/edit.png'
     #
     def image_path(source, options = {})
-      asset_path source, { :dir => 'images' }.merge(options)
+      asset_path source, Helpers.default_path_options[:image_path].merge(options)
     end
     alias_method :path_to_image, :image_path
 
@@ -235,7 +251,7 @@ module Sprockets
     #   javascript_path 'http://www.example.com/js/xmlhr.js' # => 'http://www.example.com/js/xmlhr.js'
     #
     def javascript_path(source, options = {})
-      asset_path source, { :dir => 'javascripts', :ext => 'js' }.merge(options)
+      asset_path source, Helpers.default_path_options[:javascript_path].merge(options)
     end
     alias_method :path_to_javascript, :javascript_path
 
@@ -260,7 +276,7 @@ module Sprockets
     #   stylesheet_path 'http://www.example.com/css/style.css'   # => 'http://www.example.com/css/style.css'
     #
     def stylesheet_path(source, options = {})
-      asset_path source, { :dir => 'stylesheets', :ext => 'css' }.merge(options)
+      asset_path source, Helpers.default_path_options[:stylesheet_path].merge(options)
     end
     alias_method :path_to_stylesheet, :stylesheet_path
 
@@ -284,7 +300,7 @@ module Sprockets
     #   video_path 'http://www.example.com/img/video.mp4' # => 'http://www.example.com/img/video.mp4'
     #
     def video_path(source, options = {})
-      asset_path source, { :dir => 'videos' }.merge(options)
+      asset_path source, Helpers.default_path_options[:video_path].merge(options)
     end
     alias_method :path_to_video, :video_path
 

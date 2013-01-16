@@ -379,7 +379,7 @@ describe Sprockets::Helpers do
     end
 
     it 'raises when called without block' do
-      expect { context.asset_tag('main.js') }.to raise_error(ArgumentError, "block missing")
+      expect { context.asset_tag('main.js') }.to raise_error(ArgumentError, 'block missing')
     end
 
     it 'expands when configured' do
@@ -419,11 +419,15 @@ describe Sprockets::Helpers do
 
   describe '#javascript_tag' do
     it 'generates script tag' do
-      context.javascript_tag('main.js').should == '<script src="/main.js"></script>'
+      context.javascript_tag('/main.js').should == '<script src="/main.js"></script>'
     end
 
     it 'appends extension' do
-      context.javascript_tag('main').should == '<script src="/main.js"></script>'
+      context.javascript_tag('/main').should == '<script src="/main.js"></script>'
+    end
+
+    it 'prepends the javascript dir' do
+      context.javascript_tag('main').should == '<script src="/javascripts/main.js"></script>'
     end
 
     describe 'when expanding' do
@@ -441,11 +445,15 @@ describe Sprockets::Helpers do
 
   describe '#stylesheet_tag' do
     it 'generates stylesheet tag' do
-      context.stylesheet_tag('main.css').should == '<link rel="stylesheet" href="/main.css">'
+      context.stylesheet_tag('/main.css').should == '<link rel="stylesheet" href="/main.css">'
     end
 
-    it 'generates stylesheet tag' do
-      context.stylesheet_tag('main').should == '<link rel="stylesheet" href="/main.css">'
+    it 'appends extension' do
+      context.stylesheet_tag('/main').should == '<link rel="stylesheet" href="/main.css">'
+    end
+
+    it 'prepends the stylesheets dir' do
+      context.stylesheet_tag('main').should == '<link rel="stylesheet" href="/stylesheets/main.css">'
     end
 
     describe 'when expanding' do
