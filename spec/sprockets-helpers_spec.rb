@@ -387,11 +387,11 @@ describe Sprockets::Helpers do
         assets_layout(construct)
         Sprockets::Helpers.expand = true
         c = context
-        c.stub(:asset_path).and_return(context.asset_path("main.js")) # Spy
+        c.stub(:asset_path).and_return(context.asset_path('main.js')) # Spy
         c.should_receive(:asset_path).with('main.js', {:expand => true})
         c.asset_tag('main.js') {}
         Sprockets::Helpers.expand = false
-        c.should_receive(:asset_path).with('main.js', {})
+        c.should_receive(:asset_path).with('main.js', {:expand => false})
         c.asset_tag('main.js') {}
       end
     end

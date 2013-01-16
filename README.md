@@ -35,13 +35,13 @@ class App < Sinatra::Base
   set :sprockets, Sprockets::Environment.new(root)
   set :assets_prefix, '/assets'
   set :digest_assets, false
-  
+
   configure do
     # Setup Sprockets
     sprockets.append_path File.join(root, 'assets', 'stylesheets')
     sprockets.append_path File.join(root, 'assets', 'javascripts')
     sprockets.append_path File.join(root, 'assets', 'images')
-    
+
     # Configure Sprockets::Helpers (if necessary)
     Sprockets::Helpers.configure do |config|
       config.environment = sprockets
@@ -50,17 +50,17 @@ class App < Sinatra::Base
       config.public_path = public_folder
     end
   end
-  
+
   helpers do
     include Sprockets::Helpers
-    
+
     # Alternative method for telling Sprockets::Helpers which
     # Sprockets environment to use.
     # def assets_environment
     #   settings.sprockets
     # end
   end
-  
+
   get '/' do
     erb :index
   end
@@ -116,6 +116,42 @@ Would become:
     <title>Sinatra with Sprockets 2 (Asset Pipeline)</title>
     <link rel="stylesheet" href="/assets/application.css">
     <script src="/assets/application.js"></script>
+  </head>
+  <body>
+    <img src="/assets/rails.png">
+  </body>
+</html>
+```
+
+Even better, you can use #javascript_tag and #stylesheet_tag directly, which optionally handle the expansion of assets for debugging like Rails:
+
+``` html+erb
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Sinatra with Sprockets 2 (Asset Pipeline)</title>
+    <%= stylesheet_tag 'application' %>
+    <%= javascript_tag 'application', :expand => true %>
+  </head>
+  <body>
+    <img src="<%= image_path 'rails.png' %>">
+  </body>
+</html>
+```
+
+Would become:
+
+``` html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Sinatra with Sprockets 2 (Asset Pipeline)</title>
+    <link rel="stylesheet" href="/assets/application.css">
+    <script src="/assets/jquery.js?body=1"></script>
+    <script src="/assets/jquery.ui.js?body=1"></script>
+    <script src="/assets/application.js?body=1"></script>
   </head>
   <body>
     <img src="/assets/rails.png">

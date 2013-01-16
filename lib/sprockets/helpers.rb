@@ -2,6 +2,7 @@ require 'sprockets'
 require 'sprockets/helpers/version'
 require 'sprockets/helpers/base_path'
 require 'sprockets/helpers/asset_path'
+require 'sprockets/helpers/expanded_asset_paths'
 require 'sprockets/helpers/file_path'
 require 'sprockets/helpers/manifest_path'
 require 'uri'
@@ -125,14 +126,12 @@ module Sprockets
       # environment use AssetPath to generate the full path.
       # With expand, return array of paths of assets required by asset.
       assets_environment.resolve(uri.path) do |path|
+        asset = assets_environment[path]
         if options[:expand]
-          assets = assets_environment[path].to_a
-          paths = assets.map do |asset|
-            Helpers::AssetPath.new(uri.clone, asset, options.merge({:body => true})).to_s
-          end
-          return paths
+          return Helpers::ExpandedAssetPaths.new(uri, asset, options).to_a
+        else
+          return Helpers::AssetPath.new(uri, asset, options).to_s
         end
-        return Helpers::AssetPath.new(uri, assets_environment[path], options).to_s
       end
 
       # Use FilePath for normal files on the file system
@@ -141,30 +140,23 @@ module Sprockets
     alias_method :path_to_asset, :asset_path
 
     def asset_tag(source, options = {}, &block)
-      raise ::ArgumentError, "block missing" unless block
-      options.merge!({:expand => true}) if Helpers.expand
-      if options[:expand]
-        paths = asset_path(source, options)
-        if paths.kind_of?(Array)
-          paths.map! do |path|
-            block.call(path)
-          end
-          return paths.join()
-        end
+      raise ::ArgumentError, 'block missing' unless block
+      path = asset_path source, { :expand => Helpers.expand }.merge(options)
+      if options[:expand] && path.kind_of?(Array)
+        return path.map(&block).join()
+      else
+        yield path
       end
-      yield asset_path(source, options)
     end
 
     def javascript_tag(source, options = {})
-      options.merge!({:ext => 'js'})
-      asset_tag(source, options) do |path|
+      asset_tag(source, { :ext => 'js' }.merge(options)) do |path|
         %Q(<script src="#{path}"></script>)
       end
     end
 
     def stylesheet_tag(source, options = {})
-      options.merge!({:ext => 'css'})
-      asset_tag(source, options) do |path|
+      asset_tag(source, { :ext => 'css' }.merge(options)) do |path|
         %Q(<link rel="stylesheet" href="#{path}">)
       end
     end
