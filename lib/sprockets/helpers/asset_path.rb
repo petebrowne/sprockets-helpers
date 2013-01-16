@@ -4,18 +4,25 @@ module Sprockets
     # that exists in Sprockets environment.
     class AssetPath < BasePath
       def initialize(uri, asset, options = {})
-        @uri     = uri
+        @uri = uri
+        @asset = asset
         @options = {
-          :body   => false,
+          :body => false,
           :digest => Helpers.digest,
           :prefix => Helpers.prefix
         }.merge options
-        
+
         @uri.path = @options[:digest] ? asset.digest_path : asset.logical_path
       end
-      
+
+      def to_a
+        @asset.to_a.map do |dependency|
+          AssetPath.new(@uri.clone, dependency, @options.merge(:body => true)).to_s
+        end
+      end
+
       protected
-      
+
       def rewrite_path
         prefix = if options[:prefix].respond_to? :call
           warn 'DEPRECATION WARNING: Using a Proc for Sprockets::Helpers.prefix is deprecated and will be removed in 1.0. Please use Sprockets::Helpers.asset_host instead.'
@@ -23,10 +30,10 @@ module Sprockets
         else
           options[:prefix].to_s
         end
-        
+
         prepend_path(prefix)
       end
-      
+
       def rewrite_query
         append_query('body=1') if options[:body]
       end

@@ -13,7 +13,7 @@ module Sprockets
 
       #
       def initialize(uri, options = {})
-        @uri     = uri
+        @uri = uri
         @options = options
       end
 
@@ -40,7 +40,7 @@ module Sprockets
       # Hook for rewriting the host.
       def rewrite_host # :nodoc:
         if host = compute_asset_host
-          uri.host   = host
+          uri.host = host
           uri.scheme = compute_scheme
         end
       end

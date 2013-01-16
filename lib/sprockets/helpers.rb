@@ -2,7 +2,6 @@ require 'sprockets'
 require 'sprockets/helpers/version'
 require 'sprockets/helpers/base_path'
 require 'sprockets/helpers/asset_path'
-require 'sprockets/helpers/expanded_asset_paths'
 require 'sprockets/helpers/file_path'
 require 'sprockets/helpers/manifest_path'
 require 'uri'
@@ -99,50 +98,32 @@ module Sprockets
     #
     def asset_path(source, options = {})
       uri = URI.parse(source)
-
-      # Return fast if the URI is absolute
       return source if uri.absolute?
 
-      # When debugging return paths without digests, asset_hosts, etc.
       if options[:debug]
-        options[:manifest]   = false
-        options[:digest]     = false
+        options[:manifest] = false
+        options[:digest] = false
         options[:asset_host] = false
       end
 
-      # Append extension if necessary
       source_ext = File.extname(source)
       if options[:ext] && source_ext != ".#{options[:ext]}"
         uri.path << ".#{options[:ext]}"
       end
 
-      # If a manifest is present, try to grab the path from the manifest first
-      # Don't try looking in manifest in the first place if we're not looking for digest version
-      if options[:manifest] != false && Helpers.manifest && Helpers.manifest.assets[uri.path]
-        return Helpers::ManifestPath.new(uri, Helpers.manifest.assets[uri.path], options).to_s
+      path = find_asset_path(uri, options)
+      if options[:expand] && path.respond_to?(:to_a)
+        path.to_a
+      else
+        path.to_s
       end
-
-      # If the source points to an asset in the Sprockets
-      # environment use AssetPath to generate the full path.
-      # With expand, return array of paths of assets required by asset.
-      assets_environment.resolve(uri.path) do |path|
-        asset = assets_environment[path]
-        if options[:expand]
-          return Helpers::ExpandedAssetPaths.new(uri, asset, options).to_a
-        else
-          return Helpers::AssetPath.new(uri, asset, options).to_s
-        end
-      end
-
-      # Use FilePath for normal files on the file system
-      return Helpers::FilePath.new(uri, options).to_s
     end
     alias_method :path_to_asset, :asset_path
 
     def asset_tag(source, options = {}, &block)
       raise ::ArgumentError, 'block missing' unless block
       path = asset_path source, { :expand => Helpers.expand }.merge(options)
-      if options[:expand] && path.kind_of?(Array)
+      if options[:expand] && path.respond_to?(:map)
         return path.map(&block).join()
       else
         yield path
@@ -315,6 +296,19 @@ module Sprockets
     # returned by #environment.
     def assets_environment
       Helpers.environment || environment
+    end
+
+    def find_asset_path(uri, options = {})
+      if Helpers.manifest && options[:manifest] != false
+        manifest_path = Helpers.manifest.assets[uri.path]
+        return Helpers::ManifestPath.new(uri, manifest_path, options) if manifest_path
+      end
+
+      assets_environment.resolve(uri.path) do |path|
+        return Helpers::AssetPath.new(uri, assets_environment[path], options)
+      end
+
+      return Helpers::FilePath.new(uri, options)
     end
   end
 
