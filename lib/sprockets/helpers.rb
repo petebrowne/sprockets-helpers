@@ -136,7 +136,8 @@ module Sprockets
 
     def asset_tag(source, options = {}, &block)
       raise ::ArgumentError, 'block missing' unless block
-      path = asset_path source, { :expand => Helpers.expand }.merge(options)
+      options = { :expand => Helpers.expand }.merge(options)
+      path = asset_path source, options
       if options[:expand] && path.respond_to?(:map)
         return path.map(&block).join()
       else
