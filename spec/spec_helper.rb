@@ -1,5 +1,7 @@
 require 'sprockets'
 require 'sprockets-helpers'
+require 'sinatra/base'
+require 'sinatra/sprockets/helpers'
 require 'construct'
 require 'pathname'
 
@@ -49,5 +51,4 @@ RSpec.configure do |config|
       c.file('assets/b.css')
     }.call(construct)
   end
-
 end

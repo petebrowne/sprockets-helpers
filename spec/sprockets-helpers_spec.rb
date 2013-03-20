@@ -465,4 +465,49 @@ describe Sprockets::Helpers do
       end
     end
   end
+
+  describe 'Sinatra integration' do
+    it 'adds the helpers' do
+      app = Class.new(Sinatra::Base) do
+        register Sinatra::Sprockets::Helpers
+      end
+
+      expect(app).to include(Sprockets::Helpers)
+    end
+
+    it 'automatically configures' do
+      custom_env = Sprockets::Environment.new
+
+      app = Class.new(Sinatra::Base) do
+        set :sprockets, custom_env
+        set :assets_prefix, '/static'
+        set :digest_assets, true
+
+        register Sinatra::Sprockets::Helpers
+      end
+
+      expect(Sprockets::Helpers.environment).to be(custom_env)
+      expect(Sprockets::Helpers.prefix).to eq('/static')
+      expect(Sprockets::Helpers.digest).to be_true
+    end
+
+    it 'manually configures with configure method' do
+      custom_env = Sprockets::Environment.new
+
+      app = Class.new(Sinatra::Base) do
+        register Sinatra::Sprockets::Helpers
+
+        set :sprockets, custom_env
+        set :assets_prefix, '/static'
+
+        configure_sprockets_helpers do |helpers|
+          helpers.expand = true
+        end
+      end
+
+      expect(Sprockets::Helpers.environment).to be(custom_env)
+      expect(Sprockets::Helpers.prefix).to eq('/static')
+      expect(Sprockets::Helpers.expand).to be_true
+    end
+  end
 end
