@@ -1,5 +1,4 @@
-sprockets-helpers
-=================
+# sprockets-helpers
 
 **Asset path helpers for Sprockets 2.x applications**
 
@@ -12,17 +11,13 @@ Sprockets::Helpers adds the asset_path helpers, familiar to Rails developers, to
 * Optionally outputs digest paths.
 * Falls back to file paths in the public directory & adds cache busting timestamp.
 
-
-Installation
-------------
+## Installation
 
 ``` bash
 $ gem install sprockets-helpers
 ```
 
-
-Setup
------
+## Setup
 
 Let's build a simple Sinatra app using Sprockets and Sprockets::Helpers (See my fork of [sinatra-asset-pipeline](https://github.com/petebrowne/sinatra-asset-pipeline) for complete setup):
 
@@ -67,9 +62,7 @@ class App < Sinatra::Base
 end
 ```
 
-
-Usage in Assets
----------------
+## Usage in Assets
 
 Simply requiring sprockets-helpers will add the asset path helpers to the Sprocket context, making them available within any asset. For example, a file `assets/javascripts/paths.js.erb`:
 
@@ -83,9 +76,7 @@ Would be transformed into:
 var Paths = { railsImage: '/assets/rails.png' };
 ```
 
-
-Usage in the App
-----------------
+## Usage in the App
 
 The helpers can also be used in the app itself. You just include the `Sprockets::Helpers` module and set Sprockets::Helpers.environment to the Sprockets environment to search for the assets. Alternatively you can define an #assets_environment method in the context of #asset_path, which returns a reference to the Sprockets environment (see above).
 
@@ -159,9 +150,7 @@ Would become:
 </html>
 ```
 
-
-Fallback to Public Directory
-----------------------------
+## Fallback to Public Directory
 
 If the source is not an asset in the Sprockets environment, Sprockets::Helpers will fallback to looking for the file in the application's public directory. It will also append the cache busting timestamp of the file. For example:
 
@@ -177,11 +166,9 @@ Would become:
 <img src='/images/logo.jpg?1320093919'>
 ```
 
+## Manifest Usage
 
-Manifest Usage
---------------
-
-**New in 0.4**: Sprockets::Helpers will use the latest fingerprinted filename directly from a `manifest.json` file:
+Sprockets::Helpers will use the latest fingerprinted filename directly from a `manifest.json` file:
 
 
 ``` ruby
@@ -195,8 +182,41 @@ end
 # ...
 ```
 
+## Sinatra Integration
 
-Copyright
----------
+**New in 1.0**: there is an easier way to integrate with Sinatra applications. You can register the `Sinatra::Sprockets::Helpers` extension and it will automatically include the helpers:
+
+``` ruby
+require 'sinatra/base'
+require 'sprockets'
+require 'sinatra/sprockets-helpers'
+
+class App < Sinatra::Base
+  register Sinatra::Sprockets::Helpers
+  set :sprockets, Sprockets::Environment.new(root)
+  set :assets_prefix, '/assets'
+  set :digest_assets, true
+
+  configure do
+    # Setup Sprockets
+    sprockets.append_path File.join(root, 'assets', 'stylesheets')
+    sprockets.append_path File.join(root, 'assets', 'javascripts')
+    sprockets.append_path File.join(root, 'assets', 'images')
+
+    configure_sprockets_helpers do |helpers|
+      # This will automatically configure Sprockets::Helpers based on the
+      # `sprockets`, `public_folder`, `assets_prefix`, and `digest_assets`
+      # settings if they exist. Otherwise you can configure as normal:
+      helpers.asset_host = 'some-bucket.s3.amazon.com'
+    end
+  end
+
+  get '/' do
+    erb :index
+  end
+end
+```
+
+## Copyright
 
 Copyright (c) 2011 [Peter Browne](http://petebrowne.com). See LICENSE for details.
