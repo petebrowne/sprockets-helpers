@@ -6,12 +6,12 @@ describe Sprockets::Helpers do
       within_construct do |c|
         c.file 'assets/main.css'
 
-        context.asset_path('main.css').should == '/assets/main.css'
+        expect(context.asset_path('main.css')).to eq('/assets/main.css')
         Sprockets::Helpers.configure do |config|
           config.digest = true
           config.prefix = '/themes'
         end
-        context.asset_path('main.css').should =~ %r(/themes/main-[0-9a-f]+.css)
+        expect(context.asset_path('main.css')).to match(%r(/themes/main-[0-9a-f]+.css))
         Sprockets::Helpers.digest = nil
         Sprockets::Helpers.prefix = nil
       end
@@ -23,9 +23,9 @@ describe Sprockets::Helpers do
       within_construct do |c|
         c.file 'assets/main.js'
 
-        context.asset_path('main', :ext => 'js').should == '/assets/main.js'
+        expect(context.asset_path('main', :ext => 'js')).to eq('/assets/main.js')
         Sprockets::Helpers.digest = true
-        context.asset_path('main', :ext => 'js').should =~ %r(/assets/main-[0-9a-f]+.js)
+        expect(context.asset_path('main', :ext => 'js')).to match(%r(/assets/main-[0-9a-f]+.js))
         Sprockets::Helpers.digest = nil
       end
     end
@@ -39,7 +39,7 @@ describe Sprockets::Helpers do
         custom_env = Sprockets::Environment.new
         custom_env.append_path 'themes'
         Sprockets::Helpers.environment = custom_env
-        context.asset_path('main.css').should == '/assets/main.css'
+        expect(context.asset_path('main.css')).to eq('/assets/main.css')
         Sprockets::Helpers.environment = nil
       end
     end
@@ -53,8 +53,8 @@ describe Sprockets::Helpers do
           c.file 'public/logo.jpg'
 
           Sprockets::Helpers.asset_host = 'assets.example.com'
-          context.asset_path('main.js').should == 'http://assets.example.com/assets/main.js'
-          context.asset_path('logo.jpg').should =~ %r(http://assets.example.com/logo.jpg\?\d+)
+          expect(context.asset_path('main.js')).to eq('http://assets.example.com/assets/main.js')
+          expect(context.asset_path('logo.jpg')).to match(%r(http://assets.example.com/logo.jpg\?\d+))
           Sprockets::Helpers.asset_host = nil
         end
       end
@@ -66,8 +66,8 @@ describe Sprockets::Helpers do
             c.file 'public/logo.jpg'
 
             Sprockets::Helpers.asset_host = 'assets%d.example.com'
-            context.asset_path('main.css').should =~ %r(http://assets[0-3].example.com/assets/main.css)
-            context.asset_path('logo.jpg').should =~ %r(http://assets[0-3].example.com/logo.jpg\?\d+)
+            expect(context.asset_path('main.css')).to match(%r(http://assets[0-3].example.com/assets/main.css))
+            expect(context.asset_path('logo.jpg')).to match(%r(http://assets[0-3].example.com/logo.jpg\?\d+))
             Sprockets::Helpers.asset_host = nil
           end
         end
@@ -81,8 +81,8 @@ describe Sprockets::Helpers do
           c.file 'public/logo.jpg'
 
           Sprockets::Helpers.asset_host = Proc.new { |source| File.basename(source, File.extname(source)) + '.assets.example.com' }
-          context.asset_path('main.js').should == 'http://main.assets.example.com/assets/main.js'
-          context.asset_path('logo.jpg').should =~ %r(http://logo.assets.example.com/logo.jpg\?\d+)
+          expect(context.asset_path('main.js')).to eq('http://main.assets.example.com/assets/main.js')
+          expect(context.asset_path('logo.jpg')).to match(%r(http://logo.assets.example.com/logo.jpg\?\d+))
           Sprockets::Helpers.asset_host = nil
         end
       end
@@ -94,9 +94,9 @@ describe Sprockets::Helpers do
       within_construct do |c|
         c.file 'assets/logo.jpg'
 
-        context.asset_path('logo.jpg').should == '/assets/logo.jpg'
+        expect(context.asset_path('logo.jpg')).to eq('/assets/logo.jpg')
         Sprockets::Helpers.prefix = '/images'
-        context.asset_path('logo.jpg').should == '/images/logo.jpg'
+        expect(context.asset_path('logo.jpg')).to eq('/images/logo.jpg')
         Sprockets::Helpers.prefix = nil
       end
     end
@@ -110,8 +110,8 @@ describe Sprockets::Helpers do
 
         Sprockets::Helpers.asset_host = 'assets.example.com'
         Sprockets::Helpers.protocol   = 'https'
-        context.asset_path('main.js').should == 'https://assets.example.com/assets/main.js'
-        context.asset_path('logo.jpg').should =~ %r(https://assets.example.com/logo.jpg\?\d+)
+        expect(context.asset_path('main.js')).to eq('https://assets.example.com/assets/main.js')
+        expect(context.asset_path('logo.jpg')).to match(%r(https://assets.example.com/logo.jpg\?\d+))
         Sprockets::Helpers.asset_host = nil
         Sprockets::Helpers.protocol   = nil
       end
@@ -125,8 +125,8 @@ describe Sprockets::Helpers do
 
           Sprockets::Helpers.asset_host = 'assets.example.com'
           Sprockets::Helpers.protocol   = :relative
-          context.asset_path('main.js').should == '//assets.example.com/assets/main.js'
-          context.asset_path('logo.jpg').should =~ %r(\A//assets.example.com/logo.jpg\?\d+)
+          expect(context.asset_path('main.js')).to eq('//assets.example.com/assets/main.js')
+          expect(context.asset_path('logo.jpg')).to match(%r(\A//assets.example.com/logo.jpg\?\d+))
           Sprockets::Helpers.asset_host = nil
           Sprockets::Helpers.protocol   = nil
         end
@@ -139,9 +139,9 @@ describe Sprockets::Helpers do
       within_construct do |c|
         c.file 'output/main.js'
 
-        context.asset_path('main.js').should == '/main.js'
+        expect(context.asset_path('main.js')).to eq('/main.js')
         Sprockets::Helpers.public_path = './output'
-        context.asset_path('main.js').should =~ %r(/main.js\?\d+)
+        expect(context.asset_path('main.js')).to match(%r(/main.js\?\d+))
         Sprockets::Helpers.public_path = nil
       end
     end
@@ -150,31 +150,28 @@ describe Sprockets::Helpers do
   describe '#asset_path' do
     context 'with URIs' do
       it 'returns URIs untouched' do
-        context.asset_path('https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js').should ==
-          'https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js'
-        context.asset_path('http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js').should ==
-          'http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js'
-        context.asset_path('//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js').should ==
-          '//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js'
+        expect(context.asset_path('https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js')).to eq('https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js')
+        expect(context.asset_path('http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js')).to eq('http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js')
+        expect(context.asset_path('//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js')).to eq('//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js')
       end
     end
 
     context 'with regular files' do
       it 'returns absolute paths' do
-        context.asset_path('/path/to/file.js').should == '/path/to/file.js'
-        context.asset_path('/path/to/file.jpg').should == '/path/to/file.jpg'
-        context.asset_path('/path/to/file.eot?#iefix').should == '/path/to/file.eot?#iefix'
+        expect(context.asset_path('/path/to/file.js')).to eq('/path/to/file.js')
+        expect(context.asset_path('/path/to/file.jpg')).to eq('/path/to/file.jpg')
+        expect(context.asset_path('/path/to/file.eot?#iefix')).to eq('/path/to/file.eot?#iefix')
       end
 
       it 'appends the extension for javascripts and stylesheets' do
-        context.asset_path('/path/to/file', :ext => 'js').should == '/path/to/file.js'
-        context.asset_path('/path/to/file', :ext => 'css').should == '/path/to/file.css'
+        expect(context.asset_path('/path/to/file', :ext => 'js')).to eq('/path/to/file.js')
+        expect(context.asset_path('/path/to/file', :ext => 'css')).to eq('/path/to/file.css')
       end
 
       it 'prepends a base dir' do
-        context.asset_path('main', :dir => 'stylesheets', :ext => 'css').should == '/stylesheets/main.css'
-        context.asset_path('main', :dir => 'javascripts', :ext => 'js').should == '/javascripts/main.js'
-        context.asset_path('logo.jpg', :dir => 'images').should == '/images/logo.jpg'
+        expect(context.asset_path('main', :dir => 'stylesheets', :ext => 'css')).to eq('/stylesheets/main.css')
+        expect(context.asset_path('main', :dir => 'javascripts', :ext => 'js')).to eq('/javascripts/main.js')
+        expect(context.asset_path('logo.jpg', :dir => 'images')).to eq('/images/logo.jpg')
       end
 
       it 'appends a timestamp if the file exists in the output path' do
@@ -184,10 +181,10 @@ describe Sprockets::Helpers do
           c.file 'public/font.eot'
           c.file 'public/font.svg'
 
-          context.asset_path('main', :ext => 'js').should =~ %r(/main.js\?\d+)
-          context.asset_path('/favicon.ico').should =~ %r(/favicon.ico\?\d+)
-          context.asset_path('font.eot?#iefix').should =~ %r(/font.eot\?\d+#iefix)
-          context.asset_path('font.svg#FontName').should =~ %r(/font.svg\?\d+#FontName)
+          expect(context.asset_path('main', :ext => 'js')).to match(%r{/main.js\?\d+})
+          expect(context.asset_path('/favicon.ico')).to match(%r{/favicon.ico\?\d+})
+          expect(context.asset_path('font.eot?#iefix')).to match(%r{/font.eot\?\d+#iefix})
+          expect(context.asset_path('font.svg#FontName')).to match(%r{/font.svg\?\d+#FontName})
         end
       end
     end
@@ -199,9 +196,9 @@ describe Sprockets::Helpers do
           c.file 'assets/main.js'
           c.file 'assets/main.css'
 
-          context.asset_path('main', :ext => 'css').should == '/assets/main.css'
-          context.asset_path('main', :ext => 'js').should == '/assets/main.js'
-          context.asset_path('logo.jpg').should == '/assets/logo.jpg'
+          expect(context.asset_path('main', :ext => 'css')).to eq('/assets/main.css')
+          expect(context.asset_path('main', :ext => 'js')).to eq('/assets/main.js')
+          expect(context.asset_path('logo.jpg')).to eq('/assets/logo.jpg')
         end
       end
 
@@ -209,8 +206,8 @@ describe Sprockets::Helpers do
         within_construct do |c|
           c.file 'assets/logo.jpg'
 
-          context.asset_path('logo.jpg').should == '/assets/logo.jpg'
-          context.asset_path('logo.jpg', :prefix => '/images').should == '/images/logo.jpg'
+          expect(context.asset_path('logo.jpg')).to eq('/assets/logo.jpg')
+          expect(context.asset_path('logo.jpg', :prefix => '/images')).to eq('/images/logo.jpg')
         end
       end
 
@@ -220,10 +217,10 @@ describe Sprockets::Helpers do
           c.file 'assets/font.eot'
           c.file 'assets/font.svg'
 
-          context.asset_path('main', :ext => 'js').should == '/assets/main.js'
-          context.asset_path('main', :ext => 'js', :digest => true).should =~ %r(/assets/main-[0-9a-f]+.js)
-          context.asset_path('font.eot?#iefix', :digest => true).should =~ %r(/assets/font-[0-9a-f]+.eot\?#iefix)
-          context.asset_path('font.svg#FontName', :digest => true).should =~ %r(/assets/font-[0-9a-f]+.svg#FontName)
+          expect(context.asset_path('main', :ext => 'js')).to eq('/assets/main.js')
+          expect(context.asset_path('main', :ext => 'js', :digest => true)).to match(%r{/assets/main-[0-9a-f]+.js})
+          expect(context.asset_path('font.eot?#iefix', :digest => true)).to match(%r{/assets/font-[0-9a-f]+.eot\?#iefix})
+          expect(context.asset_path('font.svg#FontName', :digest => true)).to match(%r{/assets/font-[0-9a-f]+.svg#FontName})
         end
       end
 
@@ -233,9 +230,9 @@ describe Sprockets::Helpers do
           c.file 'assets/font.eot'
           c.file 'assets/font.svg'
 
-          context.asset_path('main', :ext => 'js', :body => true).should == '/assets/main.js?body=1'
-          context.asset_path('font.eot?#iefix', :body => true).should == '/assets/font.eot?body=1#iefix'
-          context.asset_path('font.svg#FontName', :body => true).should == '/assets/font.svg?body=1#FontName'
+          expect(context.asset_path('main', :ext => 'js', :body => true)).to eq('/assets/main.js?body=1')
+          expect(context.asset_path('font.eot?#iefix', :body => true)).to eq('/assets/font.eot?body=1#iefix')
+          expect(context.asset_path('font.svg#FontName', :body => true)).to eq('/assets/font.svg?body=1#FontName')
         end
       end
     end
@@ -246,7 +243,7 @@ describe Sprockets::Helpers do
           c.file 'assets/main.js'
 
           Sprockets::Helpers.digest = true
-          context.asset_path('main.js', :debug => true).should == '/assets/main.js'
+          expect(context.asset_path('main.js', :debug => true)).to eq('/assets/main.js')
           Sprockets::Helpers.digest = nil
         end
       end
@@ -256,7 +253,7 @@ describe Sprockets::Helpers do
           c.file 'assets/main.js'
 
           Sprockets::Helpers.asset_host = 'assets.example.com'
-          context.asset_path('main.js', :debug => true).should == '/assets/main.js'
+          expect(context.asset_path('main.js', :debug => true)).to eq('/assets/main.js')
           Sprockets::Helpers.asset_host = nil
         end
       end
@@ -279,7 +276,7 @@ describe Sprockets::Helpers do
             end
 
             asset_file.delete
-            context.asset_path('application.js').should =~ %r(/assets/application-[0-9a-f]+.js)
+            expect(context.asset_path('application.js')).to match(%r(/assets/application-[0-9a-f]+.js))
 
             Sprockets::Helpers.digest = nil
             Sprockets::Helpers.prefix = nil
@@ -301,7 +298,7 @@ describe Sprockets::Helpers do
                 config.manifest = Sprockets::Manifest.new(env, manifest_file)
               end
 
-              context.asset_path('application.js', :debug => true).should == '/assets/application.js'
+              expect(context.asset_path('application.js', :debug => true)).to eq('/assets/application.js')
 
               Sprockets::Helpers.digest = nil
               Sprockets::Helpers.prefix = nil
@@ -315,13 +312,13 @@ describe Sprockets::Helpers do
   describe '#javascript_path' do
     context 'with regular files' do
       it 'appends the js extension' do
-        context.javascript_path('/path/to/file').should == '/path/to/file.js'
-        context.javascript_path('/path/to/file.min').should == '/path/to/file.min.js'
+        expect(context.javascript_path('/path/to/file')).to eq('/path/to/file.js')
+        expect(context.javascript_path('/path/to/file.min')).to eq('/path/to/file.min.js')
       end
 
       it 'prepends the javascripts dir' do
-        context.javascript_path('main').should == '/javascripts/main.js'
-        context.javascript_path('main.min').should == '/javascripts/main.min.js'
+        expect(context.javascript_path('main')).to eq('/javascripts/main.js')
+        expect(context.javascript_path('main.min')).to eq('/javascripts/main.min.js')
       end
     end
   end
@@ -329,13 +326,13 @@ describe Sprockets::Helpers do
   describe '#stylesheet_path' do
     context 'with regular files' do
       it 'appends the css extension' do
-        context.stylesheet_path('/path/to/file').should == '/path/to/file.css'
-        context.stylesheet_path('/path/to/file.min').should == '/path/to/file.min.css'
+        expect(context.stylesheet_path('/path/to/file')).to eq('/path/to/file.css')
+        expect(context.stylesheet_path('/path/to/file.min')).to eq('/path/to/file.min.css')
       end
 
       it 'prepends the stylesheets dir' do
-        context.stylesheet_path('main').should == '/stylesheets/main.css'
-        context.stylesheet_path('main.min').should == '/stylesheets/main.min.css'
+        expect(context.stylesheet_path('main')).to eq('/stylesheets/main.css')
+        expect(context.stylesheet_path('main.min')).to eq('/stylesheets/main.min.css')
       end
     end
   end
@@ -343,7 +340,7 @@ describe Sprockets::Helpers do
   describe '#image_path' do
     context 'with regular files' do
       it 'prepends the images dir' do
-        context.image_path('logo.jpg').should == '/images/logo.jpg'
+        expect(context.image_path('logo.jpg')).to eq('/images/logo.jpg')
       end
     end
   end
@@ -351,7 +348,7 @@ describe Sprockets::Helpers do
   describe '#font_path' do
     context 'with regular files' do
       it 'prepends the fonts dir' do
-        context.font_path('font.ttf').should == '/fonts/font.ttf'
+        expect(context.font_path('font.ttf')).to eq('/fonts/font.ttf')
       end
     end
   end
@@ -359,7 +356,7 @@ describe Sprockets::Helpers do
   describe '#video_path' do
     context 'with regular files' do
       it 'prepends the videos dir' do
-        context.video_path('video.mp4').should == '/videos/video.mp4'
+        expect(context.video_path('video.mp4')).to eq('/videos/video.mp4')
       end
     end
   end
@@ -367,7 +364,7 @@ describe Sprockets::Helpers do
   describe '#audio_path' do
     context 'with regular files' do
       it 'prepends the audios dir' do
-        context.audio_path('audio.mp3').should == '/audios/audio.mp3'
+        expect(context.audio_path('audio.mp3')).to eq('/audios/audio.mp3')
       end
     end
   end
@@ -375,7 +372,7 @@ describe Sprockets::Helpers do
   describe '#asset_tag' do
     it 'receives block to generate tag' do
       actual = context.asset_tag('main.js') { |path| "<script src=#{path}></script>" }
-      actual.should == '<script src=/main.js></script>'
+      expect(actual).to eq('<script src=/main.js></script>')
     end
 
     it 'raises when called without block' do
@@ -407,10 +404,10 @@ describe Sprockets::Helpers do
           tags = context.asset_tag('main.js', :expand => true) do |path|
             "<script src=\"#{path}\"></script>"
           end
-          tags.split("</script>").should have(3).scripts
-          tags.should include('<script src="/assets/main.js?body=1"></script>')
-          tags.should include('<script src="/assets/a.js?body=1"></script>')
-          tags.should include('<script src="/assets/b.js?body=1"></script>')
+          expect(tags.split('</script>')).to have(3).scripts
+          expect(tags).to include('<script src="/assets/main.js?body=1"></script>')
+          expect(tags).to include('<script src="/assets/a.js?body=1"></script>')
+          expect(tags).to include('<script src="/assets/b.js?body=1"></script>')
         end
       end
 
@@ -419,15 +416,15 @@ describe Sprockets::Helpers do
 
   describe '#javascript_tag' do
     it 'generates script tag' do
-      context.javascript_tag('/main.js').should == '<script src="/main.js"></script>'
+      expect(context.javascript_tag('/main.js')).to eq('<script src="/main.js"></script>')
     end
 
     it 'appends extension' do
-      context.javascript_tag('/main').should == '<script src="/main.js"></script>'
+      expect(context.javascript_tag('/main')).to eq('<script src="/main.js"></script>')
     end
 
     it 'prepends the javascript dir' do
-      context.javascript_tag('main').should == '<script src="/javascripts/main.js"></script>'
+      expect(context.javascript_tag('main')).to eq('<script src="/javascripts/main.js"></script>')
     end
 
     describe 'when expanding' do
@@ -435,9 +432,9 @@ describe Sprockets::Helpers do
         within_construct do |construct|
           assets_layout(construct)
           tags = context.javascript_tag('main.js', :expand => true)
-          tags.should include('<script src="/assets/main.js?body=1"></script>')
-          tags.should include('<script src="/assets/a.js?body=1"></script>')
-          tags.should include('<script src="/assets/b.js?body=1"></script>')
+          expect(tags).to include('<script src="/assets/main.js?body=1"></script>')
+          expect(tags).to include('<script src="/assets/a.js?body=1"></script>')
+          expect(tags).to include('<script src="/assets/b.js?body=1"></script>')
         end
       end
     end
@@ -445,15 +442,15 @@ describe Sprockets::Helpers do
 
   describe '#stylesheet_tag' do
     it 'generates stylesheet tag' do
-      context.stylesheet_tag('/main.css').should == '<link rel="stylesheet" href="/main.css">'
+      expect(context.stylesheet_tag('/main.css')).to eq('<link rel="stylesheet" href="/main.css">')
     end
 
     it 'appends extension' do
-      context.stylesheet_tag('/main').should == '<link rel="stylesheet" href="/main.css">'
+      expect(context.stylesheet_tag('/main')).to eq('<link rel="stylesheet" href="/main.css">')
     end
 
     it 'prepends the stylesheets dir' do
-      context.stylesheet_tag('main').should == '<link rel="stylesheet" href="/stylesheets/main.css">'
+      expect(context.stylesheet_tag('main')).to eq('<link rel="stylesheet" href="/stylesheets/main.css">')
     end
 
     describe 'when expanding' do
@@ -461,9 +458,9 @@ describe Sprockets::Helpers do
         within_construct do |construct|
           assets_layout(construct)
           tags = context.stylesheet_tag('main.css', :expand => true)
-          tags.should include('<link rel="stylesheet" href="/assets/main.css?body=1">')
-          tags.should include('<link rel="stylesheet" href="/assets/a.css?body=1">')
-          tags.should include('<link rel="stylesheet" href="/assets/b.css?body=1">')
+          expect(tags).to include('<link rel="stylesheet" href="/assets/main.css?body=1">')
+          expect(tags).to include('<link rel="stylesheet" href="/assets/a.css?body=1">')
+          expect(tags).to include('<link rel="stylesheet" href="/assets/b.css?body=1">')
         end
       end
     end
