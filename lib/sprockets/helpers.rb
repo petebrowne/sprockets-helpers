@@ -18,6 +18,13 @@ module Sprockets
       # When true, expand assets.
       attr_accessor :expand
 
+      # When true, force debug mode
+      # :debug => true equals
+      #   :expand   => true
+      #   :digest   => false
+      #   :manifest => false
+      attr_accessor :debug
+
       # Set the Sprockets environment to search for assets.
       # This defaults to the context's #environment method.
       attr_accessor :environment
@@ -114,7 +121,7 @@ module Sprockets
       uri = URI.parse(source)
       return source if uri.absolute?
 
-      if options[:debug]
+      if Helpers.debug || options[:debug]
         options[:manifest] = false
         options[:digest] = false
         options[:asset_host] = false
@@ -136,7 +143,7 @@ module Sprockets
 
     def asset_tag(source, options = {}, &block)
       raise ::ArgumentError, 'block missing' unless block
-      options = { :expand => Helpers.expand }.merge(options)
+      options = { :expand => Helpers.debug || Helpers.expand, :debug => Helpers.debug }.merge(options)
       path = asset_path source, options
       if options[:expand] && path.respond_to?(:map)
         return path.map(&block).join()
