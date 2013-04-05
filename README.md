@@ -43,6 +43,11 @@ class App < Sinatra::Base
       config.prefix      = assets_prefix
       config.digest      = digest_assets
       config.public_path = public_folder
+
+      # Force to debug mode in development mode
+      # Debug mode automatically sets
+      # expand = true, digest = false, manifest = false
+      config.debug       = true if development?
     end
   end
 

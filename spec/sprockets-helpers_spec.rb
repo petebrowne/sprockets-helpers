@@ -284,24 +284,49 @@ describe Sprockets::Helpers do
         end
 
         context 'when debuging' do
-          it 'does not read the path from the manifest file' do
-            within_construct do |c|
-              asset_file    = c.file 'assets/application.js'
-              manifest_file = c.join 'manifest.json'
+          context 'when set individually' do
+            it 'does not read the path from the manifest file' do
+              within_construct do |c|
+                asset_file    = c.file 'assets/application.js'
+                manifest_file = c.join 'manifest.json'
 
-              manifest = Sprockets::Manifest.new(env, manifest_file)
-              manifest.compile 'application.js'
+                manifest = Sprockets::Manifest.new(env, manifest_file)
+                manifest.compile 'application.js'
 
-              Sprockets::Helpers.configure do |config|
-                config.digest   = true
-                config.prefix   = '/assets'
-                config.manifest = Sprockets::Manifest.new(env, manifest_file)
+                Sprockets::Helpers.configure do |config|
+                  config.digest   = true
+                  config.prefix   = '/assets'
+                  config.manifest = Sprockets::Manifest.new(env, manifest_file)
+                end
+
+                expect(context.asset_path('application.js', :debug => true)).to eq('/assets/application.js')
+
+                Sprockets::Helpers.digest = nil
+                Sprockets::Helpers.prefix = nil
               end
+            end
+          end
 
-              expect(context.asset_path('application.js', :debug => true)).to eq('/assets/application.js')
+          context 'when set globally' do
+            it 'does not read the path from the manifest file' do
+              within_construct do |c|
+                asset_file    = c.file 'assets/application.js'
+                manifest_file = c.join 'manifest.json'
 
-              Sprockets::Helpers.digest = nil
-              Sprockets::Helpers.prefix = nil
+                manifest = Sprockets::Manifest.new(env, manifest_file)
+                manifest.compile 'application.js'
+
+                Sprockets::Helpers.debug = true
+                Sprockets::Helpers.configure do |config|
+                  config.prefix   = '/assets'
+                  config.manifest = Sprockets::Manifest.new(env, manifest_file)
+                end
+
+                expect(context.asset_path('application.js')).to eq('/assets/application.js')
+
+                Sprockets::Helpers.debug = nil
+                Sprockets::Helpers.prefix = nil
+              end
             end
           end
         end
@@ -385,10 +410,24 @@ describe Sprockets::Helpers do
         Sprockets::Helpers.expand = true
         c = context
         c.stub(:asset_path).and_return(context.asset_path('main.js')) # Spy
-        c.should_receive(:asset_path).with('main.js', {:expand => true})
+        c.should_receive(:asset_path).with('main.js', {:expand => true, :debug => nil})
         c.asset_tag('main.js') {}
         Sprockets::Helpers.expand = false
-        c.should_receive(:asset_path).with('main.js', {:expand => false})
+        c.should_receive(:asset_path).with('main.js', {:expand => false, :debug => nil})
+        c.asset_tag('main.js') {}
+      end
+    end
+
+    it 'force to be debug mode when globally configured' do
+      within_construct do |construct|
+        assets_layout(construct)
+        Sprockets::Helpers.debug = true
+        c = context
+        c.stub(:asset_path).and_return(context.asset_path('main.js')) # Spy
+        c.should_receive(:asset_path).with('main.js', {:expand => true, :debug => true})
+        c.asset_tag('main.js') {}
+        Sprockets::Helpers.debug = false
+        c.should_receive(:asset_path).with('main.js', {:expand => false, :debug => false})
         c.asset_tag('main.js') {}
       end
     end
@@ -410,7 +449,35 @@ describe Sprockets::Helpers do
           expect(tags).to include('<script src="/assets/b.js?body=1"></script>')
         end
       end
+    end
 
+    describe 'when globally debug mode is set' do
+      it 'generates tag for each asset without reading the path from manifest file' do
+        within_construct do |construct|
+          assets_layout(construct)
+          manifest_file = construct.join 'manifest.json'
+
+          manifest = Sprockets::Manifest.new(env, manifest_file)
+          manifest.compile 'main.js'
+          Sprockets::Helpers.debug = true
+          Sprockets::Helpers.configure do |config|
+            config.prefix   = '/assets'
+            config.manifest = Sprockets::Manifest.new(env, manifest_file)
+          end
+
+          tags = context.asset_tag('main.js') do |path|
+            "<script src=\"#{path}\"></script>"
+          end
+          expect(tags.split('</script>')).to have(3).scripts
+          expect(tags).to include('<script src="/assets/main.js?body=1"></script>')
+          expect(tags).to include('<script src="/assets/a.js?body=1"></script>')
+          expect(tags).to include('<script src="/assets/b.js?body=1"></script>')
+
+          Sprockets::Helpers.debug = false
+          Sprockets::Helpers.prefix = nil
+          Sprockets::Helpers.manifest = nil
+        end
+      end
     end
   end
 
