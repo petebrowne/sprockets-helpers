@@ -451,31 +451,33 @@ describe Sprockets::Helpers do
       end
     end
 
-    describe 'when globally debug mode is set' do
-      it 'generates tag for each asset without reading the path from manifest file' do
-        within_construct do |construct|
-          assets_layout(construct)
-          manifest_file = construct.join 'manifest.json'
+    if defined?(Sprockets::Manifest)
+      describe 'when globally debug mode is set' do
+        it 'generates tag for each asset without reading the path from manifest file' do
+          within_construct do |construct|
+            assets_layout(construct)
+            manifest_file = construct.join 'manifest.json'
 
-          manifest = Sprockets::Manifest.new(env, manifest_file)
-          manifest.compile 'main.js'
-          Sprockets::Helpers.debug = true
-          Sprockets::Helpers.configure do |config|
-            config.prefix   = '/assets'
-            config.manifest = Sprockets::Manifest.new(env, manifest_file)
+            manifest = Sprockets::Manifest.new(env, manifest_file)
+            manifest.compile 'main.js'
+            Sprockets::Helpers.debug = true
+            Sprockets::Helpers.configure do |config|
+              config.prefix   = '/assets'
+              config.manifest = Sprockets::Manifest.new(env, manifest_file)
+            end
+
+            tags = context.asset_tag('main.js') do |path|
+              "<script src=\"#{path}\"></script>"
+            end
+            expect(tags.split('</script>')).to have(3).scripts
+            expect(tags).to include('<script src="/assets/main.js?body=1"></script>')
+            expect(tags).to include('<script src="/assets/a.js?body=1"></script>')
+            expect(tags).to include('<script src="/assets/b.js?body=1"></script>')
+
+            Sprockets::Helpers.debug = false
+            Sprockets::Helpers.prefix = nil
+            Sprockets::Helpers.manifest = nil
           end
-
-          tags = context.asset_tag('main.js') do |path|
-            "<script src=\"#{path}\"></script>"
-          end
-          expect(tags.split('</script>')).to have(3).scripts
-          expect(tags).to include('<script src="/assets/main.js?body=1"></script>')
-          expect(tags).to include('<script src="/assets/a.js?body=1"></script>')
-          expect(tags).to include('<script src="/assets/b.js?body=1"></script>')
-
-          Sprockets::Helpers.debug = false
-          Sprockets::Helpers.prefix = nil
-          Sprockets::Helpers.manifest = nil
         end
       end
     end

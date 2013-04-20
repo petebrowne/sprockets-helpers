@@ -144,12 +144,16 @@ module Sprockets
     def asset_tag(source, options = {}, &block)
       raise ::ArgumentError, 'block missing' unless block
       options = { :expand => Helpers.debug || Helpers.expand, :debug => Helpers.debug }.merge(options)
-      path = asset_path source, options
-      if options[:expand] && path.respond_to?(:map)
-        return path.map(&block).join("\n")
+
+      path = asset_path(source, options)
+      output = if options[:expand] && path.respond_to?(:map)
+        path.map(&block).join("\n")
       else
         yield path
       end
+
+      output = output.html_safe if output.respond_to?(:html_safe)
+      output
     end
 
     def javascript_tag(source, options = {})
