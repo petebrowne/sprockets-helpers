@@ -146,7 +146,9 @@ module Sprockets
       options = { :expand => Helpers.debug || Helpers.expand, :debug => Helpers.debug }.merge(options)
 
       # Ensure that changes to source invalidate the current asset
-      depend_on_asset source
+      if respond_to? :depend_on_asset
+        depend_on_asset source
+      end
 
       path = asset_path source, options
       if options[:expand] && path.respond_to?(:map)
