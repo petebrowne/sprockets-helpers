@@ -146,7 +146,7 @@ module Sprockets
       options = { :expand => Helpers.debug || Helpers.expand, :debug => Helpers.debug }.merge(options)
       path = asset_path source, options
       if options[:expand] && path.respond_to?(:map)
-        return path.map(&block).join("\n")
+        return "\n<!-- Expanded from #{source} -->\n" + path.map(&block).join("\n")
       else
         yield path
       end
