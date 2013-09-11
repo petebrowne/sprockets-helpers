@@ -520,6 +520,10 @@ describe Sprockets::Helpers do
       expect(context.stylesheet_tag('main')).to eq('<link rel="stylesheet" href="/stylesheets/main.css">')
     end
 
+    it 'uses media attribute when provided' do
+      expect(context.stylesheet_tag('main', :media => "print")).to eq('<link rel="stylesheet" href="/stylesheets/main.css" media="print">')
+    end
+
     describe 'when expanding' do
       it 'generates stylesheet tag for each stylesheet asset' do
         within_construct do |construct|
