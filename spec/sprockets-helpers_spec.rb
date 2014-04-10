@@ -564,6 +564,20 @@ describe Sprockets::Helpers do
       expect(Sprockets::Helpers.digest).to be_true
     end
 
+    it 'uses first prefix if assets_prefix is an array' do
+      custom_env = Sprockets::Environment.new
+
+      app = Class.new(Sinatra::Base) do
+        set :sprockets, custom_env
+        set :assets_prefix,  %w(assets vendor/assets)
+
+        register Sinatra::Sprockets::Helpers
+      end
+
+      expect(Sprockets::Helpers.environment).to be(custom_env)
+      expect(Sprockets::Helpers.prefix).to eq('/assets')
+    end
+
     it 'manually configures with configure method' do
       custom_env = Sprockets::Environment.new
 
