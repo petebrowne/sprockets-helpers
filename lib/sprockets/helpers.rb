@@ -36,7 +36,7 @@ module Sprockets
       # This defaults to '/assets'.
       def prefix
         @prefix ||= '/assets'
-        @prefix.is_a?(Array) ? "/#{@prefix.first}" : @prefix
+        @prefix.respond_to?(:first) ? "/#{@prefix.first}" : @prefix
       end
       attr_writer :prefix
 
