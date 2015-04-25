@@ -395,6 +395,11 @@ describe Sprockets::Helpers do
   end
 
   describe '#asset_tag' do
+    after do
+      Sprockets::Helpers.debug = nil
+      Sprockets::Helpers.expand = nil
+    end
+
     it 'receives block to generate tag' do
       actual = context.asset_tag('main.js') { |path| "<script src=#{path}></script>" }
       expect(actual).to eq('<script src=/main.js></script>')
@@ -540,6 +545,14 @@ describe Sprockets::Helpers do
   end
 
   describe 'Sinatra integration' do
+    after do
+      ::Sprockets::Helpers.environment = nil
+      ::Sprockets::Helpers.public_path = nil
+      ::Sprockets::Helpers.digest = nil
+      ::Sprockets::Helpers.prefix = nil
+      ::Sprockets::Helpers.expand = nil
+    end
+
     it 'adds the helpers' do
       app = Class.new(Sinatra::Base) do
         register Sinatra::Sprockets::Helpers
