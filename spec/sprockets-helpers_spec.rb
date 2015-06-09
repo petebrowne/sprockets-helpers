@@ -574,7 +574,7 @@ describe Sprockets::Helpers do
 
       expect(Sprockets::Helpers.environment).to be(custom_env)
       expect(Sprockets::Helpers.prefix).to eq('/static')
-      expect(Sprockets::Helpers.digest).to be_true
+      expect(Sprockets::Helpers.digest).to be_truthy
     end
 
     it 'uses first prefix if assets_prefix is an array' do
@@ -607,7 +607,7 @@ describe Sprockets::Helpers do
 
       expect(Sprockets::Helpers.environment).to be(custom_env)
       expect(Sprockets::Helpers.prefix).to eq('/static')
-      expect(Sprockets::Helpers.expand).to be_true
+      expect(Sprockets::Helpers.expand).to be_truthy
     end
   end
 end
