@@ -2,7 +2,7 @@ require 'sprockets'
 require 'sprockets-helpers'
 require 'sinatra/base'
 require 'sinatra/sprockets/helpers'
-require 'construct'
+require 'test_construct'
 require 'pathname'
 
 # Requires supporting files with custom matchers and macros, etc,
@@ -10,7 +10,7 @@ require 'pathname'
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 RSpec.configure do |config|
-  config.include Construct::Helpers
+  config.include TestConstruct::Helpers
 
   # Disable old `should` syntax
   config.expect_with :rspec do |c|
