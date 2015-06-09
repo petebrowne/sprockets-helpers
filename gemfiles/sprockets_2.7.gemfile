@@ -4,4 +4,4 @@ source "http://rubygems.org"
 
 gem "sprockets", "~> 2.7.0"
 
-gemspec :path=>"../"
+gemspec :path => "../"

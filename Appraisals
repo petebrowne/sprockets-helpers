@@ -37,3 +37,15 @@ end
 appraise 'sprockets-2.9' do
   gem 'sprockets', '~> 2.9.0'
 end
+
+appraise 'sprockets-3.0' do
+  gem 'sprockets', '~> 3.0.0'
+end
+
+appraise 'sprockets-3.1' do
+  gem 'sprockets', '~> 3.1.0'
+end
+
+appraise 'sprockets-3.2' do
+  gem 'sprockets', '~> 3.2.0'
+end
