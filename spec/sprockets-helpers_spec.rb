@@ -448,7 +448,7 @@ describe Sprockets::Helpers do
           tags = context.asset_tag('main.js', :expand => true) do |path|
             "<script src=\"#{path}\"></script>"
           end
-          expect(tags.split('</script>')).to have(3).scripts
+          expect(tags.split('</script>').size).to eq(3)
           expect(tags).to include('<script src="/assets/main.js?body=1"></script>')
           expect(tags).to include('<script src="/assets/a.js?body=1"></script>')
           expect(tags).to include('<script src="/assets/b.js?body=1"></script>')
@@ -474,7 +474,7 @@ describe Sprockets::Helpers do
             tags = context.asset_tag('main.js') do |path|
               "<script src=\"#{path}\"></script>"
             end
-            expect(tags.split('</script>')).to have(3).scripts
+            expect(tags.split('</script>').size).to eq(3)
             expect(tags).to include('<script src="/assets/main.js?body=1"></script>')
             expect(tags).to include('<script src="/assets/a.js?body=1"></script>')
             expect(tags).to include('<script src="/assets/b.js?body=1"></script>')
