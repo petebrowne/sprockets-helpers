@@ -28,7 +28,20 @@ RSpec.configure do |config|
   # Returns a fresh context, that can be used to test helpers.
   def context(logical_path = 'application.js', pathname = nil)
     pathname ||= Pathname.new(File.join('assets', logical_path)).expand_path
-    env.context_class.new env, logical_path, pathname
+
+      # env.context_class.class_eval do
+      #   def asset_path(path, options = {})
+      #     link_asset(path)
+      #     "/#{path}"
+      #   end
+      # end
+
+      env.context_class.new(
+        :environment => env,
+        :name => logical_path,
+        :filename => pathname,
+        :metadata => {}
+      )
   end
 
   # Exemplary file system layout for usage in test-construct
