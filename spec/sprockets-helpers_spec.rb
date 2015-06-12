@@ -7,10 +7,12 @@ describe Sprockets::Helpers do
         c.file 'assets/main.css'
 
         expect(context.asset_path('main.css')).to eq('/assets/main.css')
+
         Sprockets::Helpers.configure do |config|
           config.digest = true
           config.prefix = '/themes'
         end
+
         expect(context.asset_path('main.css')).to match(%r(/themes/main-[0-9a-f]+.css))
         Sprockets::Helpers.digest = nil
         Sprockets::Helpers.prefix = nil
@@ -449,9 +451,9 @@ describe Sprockets::Helpers do
             "<script src=\"#{path}\"></script>"
           end
           expect(tags.split('</script>').size).to eq(3)
-          expect(tags).to include('<script src="/assets/main.js?body=1"></script>')
-          expect(tags).to include('<script src="/assets/a.js?body=1"></script>')
-          expect(tags).to include('<script src="/assets/b.js?body=1"></script>')
+          expect(tags).to include('<script src="/assets/main.self.js?body=1"></script>')
+          expect(tags).to include('<script src="/assets/a.self.js?body=1"></script>')
+          expect(tags).to include('<script src="/assets/b.self.js?body=1"></script>')
         end
       end
     end
@@ -475,9 +477,9 @@ describe Sprockets::Helpers do
               "<script src=\"#{path}\"></script>"
             end
             expect(tags.split('</script>').size).to eq(3)
-            expect(tags).to include('<script src="/assets/main.js?body=1"></script>')
-            expect(tags).to include('<script src="/assets/a.js?body=1"></script>')
-            expect(tags).to include('<script src="/assets/b.js?body=1"></script>')
+            expect(tags).to include('<script src="/assets/main.self.js?body=1"></script>')
+            expect(tags).to include('<script src="/assets/a.self.js?body=1"></script>')
+            expect(tags).to include('<script src="/assets/b.self.js?body=1"></script>')
 
             Sprockets::Helpers.debug = false
             Sprockets::Helpers.prefix = nil
@@ -506,9 +508,9 @@ describe Sprockets::Helpers do
         within_construct do |construct|
           assets_layout(construct)
           tags = context.javascript_tag('main.js', :expand => true)
-          expect(tags).to include('<script src="/assets/main.js?body=1"></script>')
-          expect(tags).to include('<script src="/assets/a.js?body=1"></script>')
-          expect(tags).to include('<script src="/assets/b.js?body=1"></script>')
+          expect(tags).to include('<script src="/assets/main.self.js?body=1"></script>')
+          expect(tags).to include('<script src="/assets/a.self.js?body=1"></script>')
+          expect(tags).to include('<script src="/assets/b.self.js?body=1"></script>')
         end
       end
     end
@@ -536,9 +538,9 @@ describe Sprockets::Helpers do
         within_construct do |construct|
           assets_layout(construct)
           tags = context.stylesheet_tag('main.css', :expand => true)
-          expect(tags).to include('<link rel="stylesheet" href="/assets/main.css?body=1">')
-          expect(tags).to include('<link rel="stylesheet" href="/assets/a.css?body=1">')
-          expect(tags).to include('<link rel="stylesheet" href="/assets/b.css?body=1">')
+          expect(tags).to include('<link rel="stylesheet" href="/assets/main.self.css?body=1">')
+          expect(tags).to include('<link rel="stylesheet" href="/assets/a.self.css?body=1">')
+          expect(tags).to include('<link rel="stylesheet" href="/assets/b.self.css?body=1">')
         end
       end
     end
