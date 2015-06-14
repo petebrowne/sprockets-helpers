@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = ['Pete Browne']
   s.email       = ['me@petebrowne.com']
   s.homepage    = 'https://github.com/petebrowne/sprockets-helpers'
-  s.summary     = 'Asset path helpers for Sprockets 2.x applications'
-  s.description = 'Asset path helpers for Sprockets 2.x applications'
+  s.summary     = 'Asset path helpers for Sprockets 2.x & 3.x applications'
+  s.description = 'Asset path helpers for Sprockets 2.x & 3.x applications'
 
   s.rubyforge_project = 'sprockets-helpers'
 
