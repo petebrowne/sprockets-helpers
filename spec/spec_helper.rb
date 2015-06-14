@@ -29,19 +29,16 @@ RSpec.configure do |config|
   def context(logical_path = 'application.js', pathname = nil)
     pathname ||= Pathname.new(File.join('assets', logical_path)).expand_path
 
-      # env.context_class.class_eval do
-      #   def asset_path(path, options = {})
-      #     link_asset(path)
-      #     "/#{path}"
-      #   end
-      # end
-
+    if Sprockets::Helpers.are_using_sprockets_3
       env.context_class.new(
         :environment => env,
         :name => logical_path,
         :filename => pathname,
         :metadata => {}
       )
+    else
+      env.context_class.new env, logical_path, pathname
+    end
   end
 
   # Exemplary file system layout for usage in test-construct
