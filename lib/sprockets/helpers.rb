@@ -9,6 +9,9 @@ require 'uri'
 module Sprockets
   module Helpers
     class << self
+      # Indicates whenever we are using Sprockets 3.x.
+      attr_accessor :are_using_sprockets_3
+
       # Link to assets from a dedicated server.
       attr_accessor :asset_host
 
@@ -89,6 +92,9 @@ module Sprockets
       end
     end
 
+    # We are checking here to skip this at runtime
+    @are_using_sprockets_3 = Gem::Version.new(Sprockets::VERSION) >= Gem::Version.new('3.0')
+
     # Returns the path to an asset either in the Sprockets environment
     # or the public directory. External URIs are untouched.
     #
@@ -122,6 +128,8 @@ module Sprockets
       uri = URI.parse(source)
       return source if uri.absolute?
 
+      options[:prefix] = Sprockets::Helpers.prefix unless options[:prefix]
+
       if Helpers.debug || options[:debug]
         options[:manifest] = false
         options[:digest] = false
@@ -129,11 +137,12 @@ module Sprockets
       end
 
       source_ext = File.extname(source)
+
       if options[:ext] && source_ext != ".#{options[:ext]}"
         uri.path << ".#{options[:ext]}"
       end
 
-      path = find_asset_path(uri, options)
+      path = find_asset_path(uri, source, options)
       if options[:expand] && path.respond_to?(:to_a)
         path.to_a
       else
@@ -329,17 +338,27 @@ module Sprockets
       Helpers.environment || environment
     end
 
-    def find_asset_path(uri, options = {})
+    def find_asset_path(uri, source, options = {})
       if Helpers.manifest && options[:manifest] != false
         manifest_path = Helpers.manifest.assets[uri.path]
         return Helpers::ManifestPath.new(uri, manifest_path, options) if manifest_path
       end
 
-      assets_environment.resolve(uri.path) do |path|
-        return Helpers::AssetPath.new(uri, assets_environment[path], options)
-      end
+      if Sprockets::Helpers.are_using_sprockets_3
+        resolved = assets_environment.resolve(uri.path)
 
-      return Helpers::FilePath.new(uri, options)
+        if resolved
+          return Helpers::AssetPath.new(uri, assets_environment[uri.path], options)
+        else
+          return Helpers::FilePath.new(uri, options)
+        end
+      else
+        assets_environment.resolve(uri.path) do |path|
+          return Helpers::AssetPath.new(uri, assets_environment[path], options)
+        end
+
+        return Helpers::FilePath.new(uri, options)
+      end
     end
   end
 
