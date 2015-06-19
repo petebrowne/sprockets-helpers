@@ -1,6 +1,6 @@
 # sprockets-helpers
 
-**Asset path helpers for Sprockets 2.x applications**
+**Asset path helpers for Sprockets 3.x & <= 2.2 applications**
 
 Sprockets::Helpers adds the asset_path helpers, familiar to Rails developers, to Sprockets 2.x assets and applications.
 

@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = ['Pete Browne']
   s.email       = ['me@petebrowne.com']
   s.homepage    = 'https://github.com/petebrowne/sprockets-helpers'
-  s.summary     = 'Asset path helpers for Sprockets 2.x applications'
-  s.description = 'Asset path helpers for Sprockets 2.x applications'
+  s.summary     = 'Asset path helpers for Sprockets 2.x & 3.x applications'
+  s.description = 'Asset path helpers for Sprockets 2.x & 3.x applications'
 
   s.rubyforge_project = 'sprockets-helpers'
 
@@ -18,10 +18,10 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split('\n').map{ |f| File.basename(f) }
   s.require_paths = ['lib']
 
-  s.add_dependency             'sprockets',      '~> 2.0'
-  s.add_development_dependency 'appraisal',      '~> 0.5'
+  s.add_dependency             'sprockets',      '>= 2.2'
+  s.add_development_dependency 'appraisal',      '~> 2.0'
   s.add_development_dependency 'rspec',          '~> 2.13'
-  s.add_development_dependency 'test-construct', '~> 1.2'
+  s.add_development_dependency 'test_construct', '~> 2.0'
   s.add_development_dependency 'sinatra',        '~> 1.4'
   s.add_development_dependency 'rake'
 end

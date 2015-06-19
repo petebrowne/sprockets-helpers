@@ -2,7 +2,7 @@ require 'sprockets'
 require 'sprockets-helpers'
 require 'sinatra/base'
 require 'sinatra/sprockets/helpers'
-require 'construct'
+require 'test_construct'
 require 'pathname'
 
 # Requires supporting files with custom matchers and macros, etc,
@@ -10,7 +10,7 @@ require 'pathname'
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 RSpec.configure do |config|
-  config.include Construct::Helpers
+  config.include TestConstruct::Helpers
 
   # Disable old `should` syntax
   config.expect_with :rspec do |c|
@@ -28,7 +28,17 @@ RSpec.configure do |config|
   # Returns a fresh context, that can be used to test helpers.
   def context(logical_path = 'application.js', pathname = nil)
     pathname ||= Pathname.new(File.join('assets', logical_path)).expand_path
-    env.context_class.new env, logical_path, pathname
+
+    if Sprockets::Helpers.are_using_sprockets_3
+      env.context_class.new(
+        :environment => env,
+        :name => logical_path,
+        :filename => pathname,
+        :metadata => {}
+      )
+    else
+      env.context_class.new env, logical_path, pathname
+    end
   end
 
   # Exemplary file system layout for usage in test-construct
