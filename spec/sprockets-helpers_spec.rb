@@ -416,11 +416,20 @@ describe Sprockets::Helpers do
         assets_layout(construct)
         Sprockets::Helpers.expand = true
         c = context
-        c.stub(:asset_path).and_return(context.asset_path('main.js')) # Spy
-        c.should_receive(:asset_path).with('main.js', {:expand => true, :debug => nil})
+        allow(c).to(
+          receive(:asset_path)
+          .and_return(context.asset_path('main.js'))
+        ) # Spy
+        expect(c).to(
+          receive(:asset_path)
+          .with('main.js', {:expand => true, :debug => nil})
+        )
         c.asset_tag('main.js') {}
         Sprockets::Helpers.expand = false
-        c.should_receive(:asset_path).with('main.js', {:expand => false, :debug => nil})
+        expect(c).to(
+          receive(:asset_path)
+          .with('main.js', {:expand => false, :debug => nil})
+        )
         c.asset_tag('main.js') {}
       end
     end
@@ -430,11 +439,20 @@ describe Sprockets::Helpers do
         assets_layout(construct)
         Sprockets::Helpers.debug = true
         c = context
-        c.stub(:asset_path).and_return(context.asset_path('main.js')) # Spy
-        c.should_receive(:asset_path).with('main.js', {:expand => true, :debug => true})
+        allow(c).to(
+          receive(:asset_path)
+          .and_return(context.asset_path('main.js'))
+        ) # Spy
+        expect(c).to(
+          receive(:asset_path)
+          .with('main.js', {:expand => true, :debug => true})
+        )
         c.asset_tag('main.js') {}
         Sprockets::Helpers.debug = false
-        c.should_receive(:asset_path).with('main.js', {:expand => false, :debug => false})
+        expect(c).to(
+          receive(:asset_path)
+          .with('main.js', {:expand => false, :debug => false})
+        )
         c.asset_tag('main.js') {}
       end
     end

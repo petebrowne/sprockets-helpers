@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency             'sprockets',      '>= 2.2'
   s.add_development_dependency 'appraisal',      '~> 2.0'
-  s.add_development_dependency 'rspec',          '~> 2.13'
+  s.add_development_dependency 'rspec',          '~> 3.3'
   s.add_development_dependency 'test_construct', '~> 2.0'
   s.add_development_dependency 'sinatra',        '~> 1.4'
   s.add_development_dependency 'rake'
