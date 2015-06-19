@@ -5,6 +5,7 @@ require 'sprockets/helpers/version'
 Gem::Specification.new do |s|
   s.name        = 'sprockets-helpers'
   s.version     = Sprockets::Helpers::VERSION
+  s.licenses    = ['MIT']
   s.authors     = ['Pete Browne']
   s.email       = ['me@petebrowne.com']
   s.homepage    = 'https://github.com/petebrowne/sprockets-helpers'
