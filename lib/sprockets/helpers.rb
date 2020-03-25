@@ -169,7 +169,7 @@ module Sprockets
     def javascript_tag(source, options = {})
       options = Helpers.default_path_options[:javascript_path].merge(options)
       asset_tag(source, options) do |path|
-        %Q(<script src="#{path}"></script>)
+        %Q(<script src="#{path}" type="text/javascript"></script>)
       end
     end
 
