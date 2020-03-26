@@ -178,7 +178,7 @@ module Sprockets
       media_attr = media.nil? ? nil : " media=\"#{media}\""
       options = Helpers.default_path_options[:stylesheet_path].merge(options)
       asset_tag(source, options) do |path|
-        %Q(<link rel="stylesheet" href="#{path}"#{media_attr}>)
+        %Q(<link rel="stylesheet" type="text/css" href="#{path}"#{media_attr}>)
       end
     end
 
