@@ -3,9 +3,10 @@ module Sprockets
     # `AssetPath` generates a full path for an asset
     # that exists in Sprockets environment.
     class AssetPath < BasePath
-      def initialize(uri, asset, options = {})
+      def initialize(uri, asset, environment, options = {})
         @uri = uri
         @asset = asset
+        @environment = environment
         @options = {
           :body => false,
           :digest => Helpers.digest,
@@ -16,8 +17,16 @@ module Sprockets
       end
 
       def to_a
-        @asset.to_a.map do |dependency|
-          AssetPath.new(@uri.clone, dependency, @options.merge(:body => true)).to_s
+        if @asset.respond_to?(:to_a)
+          @asset.to_a.map do |dependency|
+            AssetPath.new(@uri.clone, dependency, @environment, @options.merge(:body => true)).to_s
+          end
+        elsif @asset.metadata[:included]
+          @asset.metadata[:included].map do |uri|
+            AssetPath.new(@uri.clone, @environment.load(uri), @environment, @options.merge(:body => true)).to_s
+          end
+        else
+          AssetPath.new(@uri.clone, @asset, @environment, @options.merge(:body => true)).to_s
         end
       end
 

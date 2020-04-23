@@ -345,16 +345,16 @@ module Sprockets
       end
 
       if Sprockets::Helpers.are_using_sprockets_3
-        resolved = assets_environment.resolve(uri.path)
+        resolved, _ = assets_environment.resolve(uri.path)
 
         if resolved
-          return Helpers::AssetPath.new(uri, assets_environment[uri.path], options)
+          return Helpers::AssetPath.new(uri, assets_environment[uri.path], assets_environment, options)
         else
           return Helpers::FilePath.new(uri, options)
         end
       else
         assets_environment.resolve(uri.path) do |path|
-          return Helpers::AssetPath.new(uri, assets_environment[path], options)
+          return Helpers::AssetPath.new(uri, assets_environment[path], assets_environment, options)
         end
 
         return Helpers::FilePath.new(uri, options)

@@ -536,15 +536,15 @@ describe Sprockets::Helpers do
 
   describe '#javascript_tag' do
     it 'generates script tag' do
-      expect(context.javascript_tag('/main.js')).to eq('<script src="/main.js"></script>')
+      expect(context.javascript_tag('/main.js')).to eq('<script src="/main.js" type="text/javascript"></script>')
     end
 
     it 'appends extension' do
-      expect(context.javascript_tag('/main')).to eq('<script src="/main.js"></script>')
+      expect(context.javascript_tag('/main')).to eq('<script src="/main.js" type="text/javascript"></script>')
     end
 
     it 'prepends the javascript dir' do
-      expect(context.javascript_tag('main')).to eq('<script src="/javascripts/main.js"></script>')
+      expect(context.javascript_tag('main')).to eq('<script src="/javascripts/main.js" type="text/javascript"></script>')
     end
 
     describe 'when expanding' do
@@ -554,9 +554,9 @@ describe Sprockets::Helpers do
           within_construct do |construct|
             assets_layout(construct)
             tags = context.javascript_tag('main.js', :expand => true)
-            expect(tags).to include('<script src="/assets/main.self.js?body=1"></script>')
-            expect(tags).to include('<script src="/assets/a.self.js?body=1"></script>')
-            expect(tags).to include('<script src="/assets/b.self.js?body=1"></script>')
+            expect(tags).to include('<script src="/assets/main.self.js?body=1" type="text/javascript"></script>')
+            expect(tags).to include('<script src="/assets/a.self.js?body=1" type="text/javascript"></script>')
+            expect(tags).to include('<script src="/assets/b.self.js?body=1" type="text/javascript"></script>')
           end
         end
       end
@@ -568,9 +568,9 @@ describe Sprockets::Helpers do
             assets_layout(construct)
             tags = context.javascript_tag('main.js', :expand => true)
 
-            expect(tags).to include('<script src="/assets/main.js?body=1"></script>')
-            expect(tags).to include('<script src="/assets/a.js?body=1"></script>')
-            expect(tags).to include('<script src="/assets/b.js?body=1"></script>')
+            expect(tags).to include('<script src="/assets/main.js?body=1" type="text/javascript"></script>')
+            expect(tags).to include('<script src="/assets/a.js?body=1" type="text/javascript"></script>')
+            expect(tags).to include('<script src="/assets/b.js?body=1" type="text/javascript"></script>')
           end
         end
       end
@@ -579,19 +579,19 @@ describe Sprockets::Helpers do
 
   describe '#stylesheet_tag' do
     it 'generates stylesheet tag' do
-      expect(context.stylesheet_tag('/main.css')).to eq('<link rel="stylesheet" href="/main.css">')
+      expect(context.stylesheet_tag('/main.css')).to eq('<link rel="stylesheet" type="text/css" href="/main.css">')
     end
 
     it 'appends extension' do
-      expect(context.stylesheet_tag('/main')).to eq('<link rel="stylesheet" href="/main.css">')
+      expect(context.stylesheet_tag('/main')).to eq('<link rel="stylesheet" type="text/css" href="/main.css">')
     end
 
     it 'prepends the stylesheets dir' do
-      expect(context.stylesheet_tag('main')).to eq('<link rel="stylesheet" href="/stylesheets/main.css">')
+      expect(context.stylesheet_tag('main')).to eq('<link rel="stylesheet" type="text/css" href="/stylesheets/main.css">')
     end
 
     it 'uses media attribute when provided' do
-      expect(context.stylesheet_tag('main', :media => "print")).to eq('<link rel="stylesheet" href="/stylesheets/main.css" media="print">')
+      expect(context.stylesheet_tag('main', :media => "print")).to eq('<link rel="stylesheet" type="text/css" href="/stylesheets/main.css" media="print">')
     end
 
     describe 'when expanding' do
@@ -601,9 +601,9 @@ describe Sprockets::Helpers do
           within_construct do |construct|
             assets_layout(construct)
             tags = context.stylesheet_tag('main.css', :expand => true)
-            expect(tags).to include('<link rel="stylesheet" href="/assets/main.self.css?body=1">')
-            expect(tags).to include('<link rel="stylesheet" href="/assets/a.self.css?body=1">')
-            expect(tags).to include('<link rel="stylesheet" href="/assets/b.self.css?body=1">')
+            expect(tags).to include('<link rel="stylesheet" type="text/css" href="/assets/main.self.css?body=1">')
+            expect(tags).to include('<link rel="stylesheet" type="text/css" href="/assets/a.self.css?body=1">')
+            expect(tags).to include('<link rel="stylesheet" type="text/css" href="/assets/b.self.css?body=1">')
           end
         end
       end
@@ -614,9 +614,9 @@ describe Sprockets::Helpers do
           within_construct do |construct|
             assets_layout(construct)
             tags = context.stylesheet_tag('main.css', :expand => true)
-            expect(tags).to include('<link rel="stylesheet" href="/assets/main.css?body=1">')
-            expect(tags).to include('<link rel="stylesheet" href="/assets/a.css?body=1">')
-            expect(tags).to include('<link rel="stylesheet" href="/assets/b.css?body=1">')
+            expect(tags).to include('<link rel="stylesheet" type="text/css" href="/assets/main.css?body=1">')
+            expect(tags).to include('<link rel="stylesheet" type="text/css" href="/assets/a.css?body=1">')
+            expect(tags).to include('<link rel="stylesheet" type="text/css" href="/assets/b.css?body=1">')
           end
         end
       end
