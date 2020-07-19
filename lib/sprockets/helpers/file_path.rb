@@ -25,7 +25,7 @@ module Sprockets
       # Returns the mtime for the given path (relative to
       # the output path). Returns nil if the file doesn't exist.
       def compute_mtime # :nodoc:
-        public_path = File.join(Helpers.public_path, uri.path)
+        public_path = File.join(sprockets_helpers_settings.public_path, uri.path)
         
         if File.exist?(public_path)
           File.mtime(public_path)

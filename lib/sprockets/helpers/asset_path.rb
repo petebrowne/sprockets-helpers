@@ -7,10 +7,11 @@ module Sprockets
         @uri = uri
         @asset = asset
         @environment = environment
+        @options = options
         @options = {
           :body => false,
-          :digest => Helpers.digest,
-          :prefix => Helpers.prefix
+          :digest => sprockets_helpers_settings.digest,
+          :prefix => sprockets_helpers_settings.prefix
         }.merge options
 
         @uri.path = @options[:digest] ? asset.digest_path : asset.logical_path
