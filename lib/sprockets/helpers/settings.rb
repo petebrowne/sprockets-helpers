@@ -12,7 +12,7 @@ module Sprockets
 
       # When true, force debug mode
       # :debug => true equals
-      #   :expand   => true
+      #   :expand   => true (unless using >= Sprockets 4.0)
       #   :digest   => false
       #   :manifest => false
       attr_accessor :debug

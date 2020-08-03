@@ -13,8 +13,11 @@ module Sprockets
     class << self
       extend Forwardable
 
-      # Indicates whenever we are using Sprockets 3.x.
-      attr_accessor :are_using_sprockets_3
+      # Indicates whenever we are using Sprockets 3.x or higher.
+      attr_accessor :are_using_sprockets_3_plus
+
+      # Indicates whenever we are using Sprockets 4.x or higher.
+      attr_accessor :are_using_sprockets_4_plus
 
       # Settings of Sprockets::Helpers
       attr_accessor :settings
@@ -44,7 +47,8 @@ module Sprockets
     @settings = Settings.new
 
     # We are checking here to skip this at runtime
-    @are_using_sprockets_3 = Gem::Version.new(Sprockets::VERSION) >= Gem::Version.new('3.0')
+    @are_using_sprockets_3_plus = Gem::Version.new(Sprockets::VERSION) >= Gem::Version.new('3.0')
+    @are_using_sprockets_4_plus = Gem::Version.new(Sprockets::VERSION) >= Gem::Version.new('4.0')
 
     # Returns the path to an asset either in the Sprockets environment
     # or the public directory. External URIs are untouched.
@@ -104,7 +108,8 @@ module Sprockets
 
     def asset_tag(source, options = {}, &block)
       raise ::ArgumentError, 'block missing' unless block
-      options = { :expand => !!sprockets_helpers_settings.debug || !!sprockets_helpers_settings.expand,
+      options = { :expand => (!!sprockets_helpers_settings.debug && !::Sprockets::Helpers.are_using_sprockets_4_plus) || 
+                             !!sprockets_helpers_settings.expand,
                   :debug => sprockets_helpers_settings.debug }.merge(options)
 
       path = asset_path(source, options)
@@ -299,14 +304,23 @@ module Sprockets
     end
 
     def find_asset_path(uri, source, options = {})
-      options = options.merge(:sprockets_helpers_settings => sprockets_helpers_settings)
+      options = options.merge(:sprockets_helpers_settings => sprockets_helpers_settings,
+                              :debug => sprockets_helpers_settings.debug)
 
       if sprockets_helpers_settings.manifest && options[:manifest] != false
         manifest_path = sprockets_helpers_settings.manifest.assets[uri.path]
         return Helpers::ManifestPath.new(uri, manifest_path, options) if manifest_path
       end
 
-      if Sprockets::Helpers.are_using_sprockets_3
+      if Sprockets::Helpers.are_using_sprockets_4_plus
+        resolved, _ = assets_environment.resolve(uri.path, pipeline: options[:debug] ? :debug : nil)
+
+        if resolved
+          return Helpers::AssetPath.new(uri, assets_environment[uri.path, pipeline: options[:debug] ? :debug : nil], assets_environment, options)
+        else
+          return Helpers::FilePath.new(uri, options)
+        end
+      elsif Sprockets::Helpers.are_using_sprockets_3_plus
         resolved, _ = assets_environment.resolve(uri.path)
 
         if resolved
