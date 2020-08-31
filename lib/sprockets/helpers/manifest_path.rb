@@ -5,9 +5,10 @@ module Sprockets
     class ManifestPath < AssetPath
       def initialize(uri, path, options = {})
         @uri = uri
+        @options = options
         @options = {
           :body => false,
-          :prefix => Helpers.prefix
+          :prefix => sprockets_helpers_settings.prefix
         }.merge options
 
         @uri.path = path.to_s

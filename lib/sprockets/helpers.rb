@@ -4,78 +4,30 @@ require 'sprockets/helpers/base_path'
 require 'sprockets/helpers/asset_path'
 require 'sprockets/helpers/file_path'
 require 'sprockets/helpers/manifest_path'
+require 'sprockets/helpers/settings'
 require 'uri'
+require 'forwardable'
 
 module Sprockets
   module Helpers
     class << self
-      # Indicates whenever we are using Sprockets 3.x.
-      attr_accessor :are_using_sprockets_3
+      extend Forwardable
 
-      # Link to assets from a dedicated server.
-      attr_accessor :asset_host
+      # Indicates whenever we are using Sprockets 3.x or higher.
+      attr_accessor :are_using_sprockets_3_plus
 
-      # When true, the asset paths will return digest paths.
-      attr_accessor :digest
+      # Indicates whenever we are using Sprockets 4.x or higher.
+      attr_accessor :are_using_sprockets_4_plus
 
-      # When true, expand assets.
-      attr_accessor :expand
+      # Settings of Sprockets::Helpers
+      attr_accessor :settings
 
-      # When true, force debug mode
-      # :debug => true equals
-      #   :expand   => true
-      #   :digest   => false
-      #   :manifest => false
-      attr_accessor :debug
-
-      # Set the Sprockets environment to search for assets.
-      # This defaults to the context's #environment method.
-      attr_accessor :environment
-
-      # The manifest file used for lookup
-      attr_accessor :manifest
-
-      # The base URL the Sprocket environment is mapped to.
-      # This defaults to '/assets'.
-      def prefix
-        @prefix ||= '/assets'
-        @prefix.is_a?(Array) ? "/#{@prefix.first}" : @prefix
-      end
-      attr_writer :prefix
-
-      # Customize the protocol when using asset hosts.
-      # If the value is :relative, A relative protocol ('//')
-      # will be used.
-      def protocol
-        @protocol ||= 'http://'
-      end
-      attr_writer :protocol
-
-      # The path to the public directory, where the assets
-      # not managed by Sprockets will be located.
-      # Defaults to './public'
-      def public_path
-        @public_path ||= './public'
-      end
-      attr_writer :public_path
-
-      # The default options for each asset path method. This is where you
-      # can change your default directories for the fallback directory.
-      def default_path_options
-        @default_path_options ||= {
-          :audio_path => { :dir => 'audios' },
-          :font_path => { :dir => 'fonts' },
-          :image_path => { :dir => 'images' },
-          :javascript_path => { :dir => 'javascripts', :ext => 'js' },
-          :stylesheet_path => { :dir => 'stylesheets', :ext => 'css' },
-          :video_path => { :dir => 'videos' }
-        }
-      end
-      attr_writer :default_path_options
+      # Access the settings directly for compatibility purposes.
+      def_delegators :@settings, *Settings.public_instance_methods(false)
 
       # Convience method for configuring Sprockets::Helpers.
       def configure
-        yield self
+        yield settings
       end
 
       # Hack to ensure methods from Sprockets::Helpers override the
@@ -92,8 +44,11 @@ module Sprockets
       end
     end
 
+    @settings = Settings.new
+
     # We are checking here to skip this at runtime
-    @are_using_sprockets_3 = Gem::Version.new(Sprockets::VERSION) >= Gem::Version.new('3.0')
+    @are_using_sprockets_3_plus = Gem::Version.new(Sprockets::VERSION) >= Gem::Version.new('3.0')
+    @are_using_sprockets_4_plus = Gem::Version.new(Sprockets::VERSION) >= Gem::Version.new('4.0')
 
     # Returns the path to an asset either in the Sprockets environment
     # or the public directory. External URIs are untouched.
@@ -128,9 +83,9 @@ module Sprockets
       uri = URI.parse(source)
       return source if uri.absolute?
 
-      options[:prefix] = Sprockets::Helpers.prefix unless options[:prefix]
+      options[:prefix] = sprockets_helpers_settings.prefix unless options[:prefix]
 
-      if Helpers.debug || options[:debug]
+      if sprockets_helpers_settings.debug || options[:debug]
         options[:manifest] = false
         options[:digest] = false
         options[:asset_host] = false
@@ -153,7 +108,9 @@ module Sprockets
 
     def asset_tag(source, options = {}, &block)
       raise ::ArgumentError, 'block missing' unless block
-      options = { :expand => !!Helpers.debug || !!Helpers.expand, :debug => Helpers.debug }.merge(options)
+      options = { :expand => (!!sprockets_helpers_settings.debug && !::Sprockets::Helpers.are_using_sprockets_4_plus) || 
+                             !!sprockets_helpers_settings.expand,
+                  :debug => sprockets_helpers_settings.debug }.merge(options)
 
       path = asset_path(source, options)
       output = if options[:expand] && path.respond_to?(:map)
@@ -167,7 +124,7 @@ module Sprockets
     end
 
     def javascript_tag(source, options = {})
-      options = Helpers.default_path_options[:javascript_path].merge(options)
+      options = sprockets_helpers_settings.default_path_options[:javascript_path].merge(options)
       asset_tag(source, options) do |path|
         %Q(<script src="#{path}" type="text/javascript"></script>)
       end
@@ -176,7 +133,7 @@ module Sprockets
     def stylesheet_tag(source, options = {})
       media = options.delete(:media)
       media_attr = media.nil? ? nil : " media=\"#{media}\""
-      options = Helpers.default_path_options[:stylesheet_path].merge(options)
+      options = sprockets_helpers_settings.default_path_options[:stylesheet_path].merge(options)
       asset_tag(source, options) do |path|
         %Q(<link rel="stylesheet" type="text/css" href="#{path}"#{media_attr}>)
       end
@@ -202,7 +159,7 @@ module Sprockets
     #   audio_path 'http://www.example.com/img/audio.mp3' # => 'http://www.example.com/img/audio.mp3'
     #
     def audio_path(source, options = {})
-      asset_path source, Helpers.default_path_options[:audio_path].merge(options)
+      asset_path source, sprockets_helpers_settings.default_path_options[:audio_path].merge(options)
     end
     alias_method :path_to_audio, :audio_path
 
@@ -226,7 +183,7 @@ module Sprockets
     #   font_path 'http://www.example.com/img/font.ttf' # => 'http://www.example.com/img/font.ttf'
     #
     def font_path(source, options = {})
-      asset_path source, Helpers.default_path_options[:font_path].merge(options)
+      asset_path source, sprockets_helpers_settings.default_path_options[:font_path].merge(options)
     end
     alias_method :path_to_font, :font_path
 
@@ -250,7 +207,7 @@ module Sprockets
     #   image_path 'http://www.example.com/img/edit.png' # => 'http://www.example.com/img/edit.png'
     #
     def image_path(source, options = {})
-      asset_path source, Helpers.default_path_options[:image_path].merge(options)
+      asset_path source, sprockets_helpers_settings.default_path_options[:image_path].merge(options)
     end
     alias_method :path_to_image, :image_path
 
@@ -275,7 +232,7 @@ module Sprockets
     #   javascript_path 'http://www.example.com/js/xmlhr.js' # => 'http://www.example.com/js/xmlhr.js'
     #
     def javascript_path(source, options = {})
-      asset_path source, Helpers.default_path_options[:javascript_path].merge(options)
+      asset_path source, sprockets_helpers_settings.default_path_options[:javascript_path].merge(options)
     end
     alias_method :path_to_javascript, :javascript_path
 
@@ -300,7 +257,7 @@ module Sprockets
     #   stylesheet_path 'http://www.example.com/css/style.css'   # => 'http://www.example.com/css/style.css'
     #
     def stylesheet_path(source, options = {})
-      asset_path source, Helpers.default_path_options[:stylesheet_path].merge(options)
+      asset_path source, sprockets_helpers_settings.default_path_options[:stylesheet_path].merge(options)
     end
     alias_method :path_to_stylesheet, :stylesheet_path
 
@@ -324,7 +281,7 @@ module Sprockets
     #   video_path 'http://www.example.com/img/video.mp4' # => 'http://www.example.com/img/video.mp4'
     #
     def video_path(source, options = {})
-      asset_path source, Helpers.default_path_options[:video_path].merge(options)
+      asset_path source, sprockets_helpers_settings.default_path_options[:video_path].merge(options)
     end
     alias_method :path_to_video, :video_path
 
@@ -332,19 +289,38 @@ module Sprockets
 
     # Returns the Sprockets environment #asset_path uses to search for
     # assets. This can be overridden for more control, if necessary.
-    # Defaults to Sprockets::Helpers.environment or the envrionment
+    # For even more control, you just need to override #sprockets_helper_settings.
+    # Defaults to sprockets_helpers_settings.environment or the environment
     # returned by #environment.
     def assets_environment
-      Helpers.environment || environment
+      sprockets_helpers_settings.environment || environment
+    end
+    
+    # Returns the Sprockets helpers settings. This can be overridden for
+    # more control, for instance if you want to support polyinstantiation
+    # in your application.
+    def sprockets_helpers_settings
+      Helpers.settings
     end
 
     def find_asset_path(uri, source, options = {})
-      if Helpers.manifest && options[:manifest] != false
-        manifest_path = Helpers.manifest.assets[uri.path]
+      options = options.merge(:sprockets_helpers_settings => sprockets_helpers_settings,
+                              :debug => sprockets_helpers_settings.debug)
+
+      if sprockets_helpers_settings.manifest && options[:manifest] != false
+        manifest_path = sprockets_helpers_settings.manifest.assets[uri.path]
         return Helpers::ManifestPath.new(uri, manifest_path, options) if manifest_path
       end
 
-      if Sprockets::Helpers.are_using_sprockets_3
+      if Sprockets::Helpers.are_using_sprockets_4_plus
+        resolved, _ = assets_environment.resolve(uri.path, pipeline: options[:debug] ? :debug : nil)
+
+        if resolved
+          return Helpers::AssetPath.new(uri, assets_environment[uri.path, pipeline: options[:debug] ? :debug : nil], assets_environment, options)
+        else
+          return Helpers::FilePath.new(uri, options)
+        end
+      elsif Sprockets::Helpers.are_using_sprockets_3_plus
         resolved, _ = assets_environment.resolve(uri.path)
 
         if resolved

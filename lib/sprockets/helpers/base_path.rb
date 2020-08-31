@@ -17,6 +17,10 @@ module Sprockets
         @options = options
       end
 
+      def sprockets_helpers_settings
+        @options[:sprockets_helpers_settings]
+      end
+
       # Returns the full path to the asset, complete with
       # timestamp.
       def to_s
@@ -53,7 +57,7 @@ module Sprockets
       def compute_asset_host # :nodoc:
         return nil if options[:asset_host] == false
 
-        if host = options[:asset_host] || Helpers.asset_host
+        if host = options[:asset_host] || sprockets_helpers_settings.asset_host
           if host.respond_to?(:call)
             host.call(uri.to_s)
           elsif host =~ /%d/
@@ -69,7 +73,7 @@ module Sprockets
       # Pick a scheme for the protocol if we are using
       # an asset host.
       def compute_scheme # :nodoc:
-        protocol = options[:protocol] || Helpers.protocol
+        protocol = options[:protocol] || sprockets_helpers_settings.protocol
 
         if protocol.nil? || protocol == :relative
           nil
